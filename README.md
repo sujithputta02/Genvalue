@@ -77,7 +77,7 @@ bun run dev:full
 | --- | --- |
 | Frontend | http://localhost:3000 |
 | Backend API | http://localhost:5001 |
-| Health check | http://localhost:5001/health |
+| Health check Route | http://localhost:5001/health |
 
 ### Useful scripts
 
