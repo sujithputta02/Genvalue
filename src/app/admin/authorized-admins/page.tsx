@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import {
@@ -11,13 +11,17 @@ import {
   FaShieldHalved,
   FaTrash,
   FaUserShield,
+  FaIdBadge,
 } from "react-icons/fa6";
 import {
   addAuthorizedAdmin,
+  createAdminOrgRole,
   getAdminPortalSettings,
   getAdminProfile,
+  listAdminOrgRoles,
   listAuthorizedAdmins,
   removeAuthorizedAdmin,
+  updateAdminOrgRole,
   updateAdminPortalSettings,
   updateAuthorizedAdmin,
   type AdminOrgRoleKey,
@@ -25,26 +29,61 @@ import {
   type AuthorizedAdmin,
 } from "@/services/adminService";
 import {
-  ADMIN_ORG_ROLE_CHECKLIST,
+  ALL_PORTAL_SECTIONS,
   GRANTABLE_PORTAL_SECTION_LABELS,
   adminHasPortalSection,
   getFirstAllowedAdminHref,
   getOrgRoleLabel,
   rolesGrantSecurityAccess,
+  slugifyOrgRoleKey,
+  type AdminOrgRoleDefinition,
   type PortalSectionKey,
 } from "@/lib/adminRoles";
 import { useAdminPortalPath } from "@/hooks/useAdminPortalPath";
 import { ListItemsSkeleton } from "@/components/skeletons";
 
+function formatAdminSessionTime(
+  value: string | null | undefined,
+  timeZone?: string | null
+): string {
+  if (!value) return "Never";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "Never";
+
+  const options: Intl.DateTimeFormatOptions = {
+    weekday: "short",
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: true,
+    timeZoneName: "short",
+  };
+
+  try {
+    if (timeZone) {
+      return date.toLocaleString(undefined, { ...options, timeZone });
+    }
+  } catch {
+    // Fall through to viewer locale if stored zone is invalid.
+  }
+
+  return date.toLocaleString(undefined, options);
+}
+
 export default function AuthorizedAdminsPage() {
   const router = useRouter();
   const { sessionId } = useAdminPortalPath();
   const [admins, setAdmins] = useState<AuthorizedAdmin[]>([]);
+  const [orgRoles, setOrgRoles] = useState<AdminOrgRoleDefinition[]>([]);
   const [portalSettings, setPortalSettings] = useState<AdminPortalSettings | null>(null);
   const [adminEmailLimit, setAdminEmailLimit] = useState("");
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [savingLimit, setSavingLimit] = useState(false);
+  const [savingRole, setSavingRole] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [email, setEmail] = useState("");
@@ -59,17 +98,49 @@ export default function AuthorizedAdminsPage() {
   const [editGrantSuperAdmin, setEditGrantSuperAdmin] = useState(false);
   const [editGrantSecurityAccess, setEditGrantSecurityAccess] = useState(false);
 
+  const [newRoleLabel, setNewRoleLabel] = useState("");
+  const [newRoleKey, setNewRoleKey] = useState("");
+  const [newRoleSections, setNewRoleSections] = useState<PortalSectionKey[]>([
+    "STUDENTS",
+    "ANNOUNCEMENTS",
+  ]);
+  const [editingRoleKey, setEditingRoleKey] = useState<string | null>(null);
+  const [editRoleLabel, setEditRoleLabel] = useState("");
+  const [editRoleSections, setEditRoleSections] = useState<PortalSectionKey[]>([]);
+
+  const activeRoleChecklist = useMemo(
+    () =>
+      orgRoles
+        .filter((role) => role.isActive !== false)
+        .map((role) => ({ key: role.key, label: role.label })),
+    [orgRoles]
+  );
+
   const loadPageData = async () => {
     try {
       setLoading(true);
       setError("");
-      const [adminList, settings] = await Promise.all([
+      const [adminList, settings, roleCatalogue] = await Promise.all([
         listAuthorizedAdmins(),
         getAdminPortalSettings(),
+        listAdminOrgRoles(true),
       ]);
       setAdmins(adminList);
       setPortalSettings(settings);
       setAdminEmailLimit(String(settings.maxAuthorizedAdmins));
+      setOrgRoles(roleCatalogue.roles);
+      const activeKeys = roleCatalogue.roles
+        .filter((role) => role.isActive !== false)
+        .map((role) => role.key);
+      if (activeKeys.includes("CTO")) {
+        setSelectedRoles((prev) =>
+          prev.length === 0 || prev.every((key) => activeKeys.includes(key)) ? prev : ["CTO"]
+        );
+      } else if (activeKeys[0]) {
+        setSelectedRoles((prev) =>
+          prev.every((key) => activeKeys.includes(key)) ? prev : [activeKeys[0]!]
+        );
+      }
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Failed to load authorized admins");
     } finally {
@@ -92,7 +163,7 @@ export default function AuthorizedAdminsPage() {
     securityGranted: boolean,
     isSuperAdmin: boolean
   ): PortalSectionKey[] => {
-    if (isSuperAdmin || rolesGrantSecurityAccess(roles)) return [];
+    if (isSuperAdmin || rolesGrantSecurityAccess(roles, orgRoles)) return [];
     return securityGranted ? ["SECURITY"] : [];
   };
 
@@ -103,7 +174,8 @@ export default function AuthorizedAdminsPage() {
         roles: admin.roles,
         portalSections: admin.portalSections,
       },
-      "SECURITY"
+      "SECURITY",
+      orgRoles
     );
 
   const isPrimarySuperAdmin = (admin: AuthorizedAdmin): boolean =>
@@ -115,6 +187,18 @@ export default function AuthorizedAdminsPage() {
     setter: (roles: AdminOrgRoleKey[]) => void
   ) => {
     setter(current.includes(role) ? current.filter((r) => r !== role) : [...current, role]);
+  };
+
+  const toggleSection = (
+    section: PortalSectionKey,
+    current: PortalSectionKey[],
+    setter: (sections: PortalSectionKey[]) => void
+  ) => {
+    setter(
+      current.includes(section)
+        ? current.filter((item) => item !== section)
+        : [...current, section]
+    );
   };
 
   const parseUserLimitInput = (value: string): number | null => {
@@ -150,6 +234,87 @@ export default function AuthorizedAdminsPage() {
     }
   };
 
+  const handleCreateRole = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSavingRole(true);
+    setError("");
+    setSuccess("");
+
+    try {
+      const label = newRoleLabel.trim();
+      if (!label) throw new Error("Role label is required");
+      if (newRoleSections.length === 0) {
+        throw new Error("Select at least one portal section for the role");
+      }
+
+      const created = await createAdminOrgRole({
+        label,
+        key: newRoleKey.trim() || undefined,
+        portalSections: newRoleSections,
+      });
+
+      setNewRoleLabel("");
+      setNewRoleKey("");
+      setNewRoleSections(["STUDENTS", "ANNOUNCEMENTS"]);
+      setSuccess(`Role "${created.label}" created. You can assign it to admins below.`);
+      await loadPageData();
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Failed to create role");
+    } finally {
+      setSavingRole(false);
+    }
+  };
+
+  const openEditRole = (role: AdminOrgRoleDefinition) => {
+    setEditingRoleKey(role.key);
+    setEditRoleLabel(role.label);
+    setEditRoleSections(role.portalSections ?? []);
+    setError("");
+    setSuccess("");
+  };
+
+  const handleUpdateRole = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingRoleKey) return;
+    setSavingRole(true);
+    setError("");
+    setSuccess("");
+
+    try {
+      const label = editRoleLabel.trim();
+      if (!label) throw new Error("Role label is required");
+      if (editRoleSections.length === 0) {
+        throw new Error("Select at least one portal section for the role");
+      }
+
+      const updated = await updateAdminOrgRole(editingRoleKey, {
+        label,
+        portalSections: editRoleSections,
+      });
+      setEditingRoleKey(null);
+      setSuccess(`Role "${updated.label}" updated.`);
+      await loadPageData();
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Failed to update role");
+    } finally {
+      setSavingRole(false);
+    }
+  };
+
+  const handleDeactivateRole = async (role: AdminOrgRoleDefinition) => {
+    if (role.isSystem) return;
+    if (!confirm(`Deactivate role "${role.label}"? Admins must not be using it.`)) return;
+
+    try {
+      setError("");
+      await updateAdminOrgRole(role.key, { isActive: false });
+      setSuccess(`Role "${role.label}" deactivated.`);
+      await loadPageData();
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Failed to deactivate role");
+    }
+  };
+
   const handleAdd = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
@@ -169,7 +334,7 @@ export default function AuthorizedAdminsPage() {
 
       const limit = grantSuperAdmin ? null : parseUserLimitInput(userLimit);
 
-      await addAuthorizedAdmin(email, {
+      const result = await addAuthorizedAdmin(email, {
         name: name || undefined,
         roles: grantSuperAdmin ? ["CTO"] : selectedRoles,
         userLimit: limit,
@@ -183,7 +348,11 @@ export default function AuthorizedAdminsPage() {
       setUserLimit("");
       setGrantSuperAdmin(false);
       setGrantSecurityAccess(false);
-      setSuccess(`Access granted to ${email.trim().toLowerCase()}. They will receive an email notification.`);
+      setSuccess(
+        result.emailSent
+          ? `Access granted to ${email.trim().toLowerCase()}. A GenValue welcome email was sent.`
+          : `Access granted to ${email.trim().toLowerCase()}, but the welcome email could not be sent. Check Brevo settings.`
+      );
       await loadPageData();
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Failed to add admin");
@@ -257,33 +426,71 @@ export default function AuthorizedAdminsPage() {
     idPrefix,
     disabled = false,
   }: {
-    roles: typeof ADMIN_ORG_ROLE_CHECKLIST;
+    roles: { key: string; label: string }[];
     selected: AdminOrgRoleKey[];
     onToggle: (role: AdminOrgRoleKey) => void;
     idPrefix: string;
     disabled?: boolean;
   }) => (
     <div className="grid gap-2 sm:grid-cols-2">
-      {roles.map((role) => (
+      {roles.length === 0 ? (
+        <p className="text-xs text-[#6B6558] dark:text-slate-400 sm:col-span-2">
+          No active roles yet. Create a role above first.
+        </p>
+      ) : (
+        roles.map((role) => (
+          <label
+            key={role.key}
+            htmlFor={`${idPrefix}-${role.key}`}
+            className={`flex items-center gap-3 rounded-xl border border-black/10 bg-white/40 px-4 py-3 transition dark:border-white/10 dark:bg-white/5 ${
+              disabled
+                ? "cursor-not-allowed opacity-60"
+                : "cursor-pointer hover:border-[#1E3FE0]/30 dark:hover:border-[#60A5FA]/30"
+            }`}
+          >
+            <input
+              id={`${idPrefix}-${role.key}`}
+              type="checkbox"
+              checked={selected.includes(role.key)}
+              disabled={disabled}
+              onChange={() => onToggle(role.key)}
+              aria-label={`Assign ${role.label} role`}
+              className="h-4 w-4 rounded border-black/20 accent-[#1E3FE0]"
+            />
+            <span className="text-sm font-semibold text-[#2A2A28] dark:text-white">{role.label}</span>
+          </label>
+        ))
+      )}
+    </div>
+  );
+
+  const SectionCheckboxGroup = ({
+    selected,
+    onToggle,
+    idPrefix,
+  }: {
+    selected: PortalSectionKey[];
+    onToggle: (section: PortalSectionKey) => void;
+    idPrefix: string;
+  }) => (
+    <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+      {ALL_PORTAL_SECTIONS.map((section) => (
         <label
-          key={role.key}
-          htmlFor={`${idPrefix}-${role.key}`}
-          className={`flex items-center gap-3 rounded-xl border border-black/10 bg-white/40 px-4 py-3 transition dark:border-white/10 dark:bg-white/5 ${
-            disabled
-              ? "cursor-not-allowed opacity-60"
-              : "cursor-pointer hover:border-[#1E3FE0]/30 dark:hover:border-[#60A5FA]/30"
-          }`}
+          key={section}
+          htmlFor={`${idPrefix}-${section}`}
+          className="flex cursor-pointer items-center gap-3 rounded-xl border border-black/10 bg-white/40 px-4 py-3 transition hover:border-[#1E3FE0]/30 dark:border-white/10 dark:bg-white/5 dark:hover:border-[#60A5FA]/30"
         >
           <input
-            id={`${idPrefix}-${role.key}`}
+            id={`${idPrefix}-${section}`}
             type="checkbox"
-            checked={selected.includes(role.key)}
-            disabled={disabled}
-            onChange={() => onToggle(role.key)}
-            aria-label={`Assign ${role.label} role`}
+            checked={selected.includes(section)}
+            onChange={() => onToggle(section)}
+            aria-label={`Grant ${GRANTABLE_PORTAL_SECTION_LABELS[section]}`}
             className="h-4 w-4 rounded border-black/20 accent-[#1E3FE0]"
           />
-          <span className="text-sm font-semibold text-[#2A2A28] dark:text-white">{role.label}</span>
+          <span className="text-sm font-semibold text-[#2A2A28] dark:text-white">
+            {GRANTABLE_PORTAL_SECTION_LABELS[section]}
+          </span>
         </label>
       ))}
     </div>
@@ -340,8 +547,8 @@ export default function AuthorizedAdminsPage() {
           Authorized Admin Emails
         </h1>
         <p className="text-xs font-medium text-[#6B6558] dark:text-slate-400">
-          Control who can sign in to the admin portal. Grant super admin access, assign org roles,
-          and choose who can view Portal Security. Super admins do not count toward the email limit.
+          Create org roles, assign them to admins, and control portal access — no code changes
+          required for new titles.
         </p>
       </div>
 
@@ -356,6 +563,213 @@ export default function AuthorizedAdminsPage() {
           {success}
         </div>
       )}
+
+      <motion.form
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        onSubmit={handleCreateRole}
+        className="rounded-2xl border border-[#1E3FE0]/20 bg-[#F6F1E4] p-6 shadow-lg dark:border-[#60A5FA]/30 dark:bg-[#0D1B2A]"
+      >
+        <h2 className="mb-1 flex items-center gap-2 text-lg font-bold text-[#2A2A28] dark:text-white">
+          <FaIdBadge className="h-4 w-4 text-[#1E3FE0]" />
+          Create Org Role
+        </h2>
+        <p className="mb-4 text-xs text-[#6B6558] dark:text-slate-400">
+          Roles are stored in the database. Pick which portal sections this title unlocks, then
+          assign it when authorizing an admin email.
+        </p>
+
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div>
+            <label
+              htmlFor="new-role-label"
+              className="mb-2 block text-xs font-bold uppercase tracking-wider text-[#6B6558]"
+            >
+              Role label <span className="text-red-500">*</span>
+            </label>
+            <input
+              id="new-role-label"
+              type="text"
+              required
+              value={newRoleLabel}
+              onChange={(e) => {
+                setNewRoleLabel(e.target.value);
+                if (!newRoleKey || newRoleKey === slugifyOrgRoleKey(newRoleLabel)) {
+                  setNewRoleKey(slugifyOrgRoleKey(e.target.value));
+                }
+              }}
+              placeholder="e.g. Marketing Lead"
+              aria-label="New role label"
+              className={inputClass}
+            />
+          </div>
+          <div>
+            <label
+              htmlFor="new-role-key"
+              className="mb-2 block text-xs font-bold uppercase tracking-wider text-[#6B6558]"
+            >
+              Role key (auto)
+            </label>
+            <input
+              id="new-role-key"
+              type="text"
+              value={newRoleKey}
+              onChange={(e) => setNewRoleKey(slugifyOrgRoleKey(e.target.value))}
+              placeholder="MARKETING_LEAD"
+              aria-label="New role key slug"
+              className={inputClass}
+            />
+          </div>
+        </div>
+
+        <div className="mt-4">
+          <p className="mb-2 text-xs font-bold uppercase tracking-wider text-[#6B6558]">
+            Portal sections <span className="text-red-500">*</span>
+          </p>
+          <SectionCheckboxGroup
+            idPrefix="create-role-section"
+            selected={newRoleSections}
+            onToggle={(section) => toggleSection(section, newRoleSections, setNewRoleSections)}
+          />
+        </div>
+
+        <button
+          type="submit"
+          disabled={savingRole}
+          aria-label="Create organization role"
+          className="mt-4 inline-flex items-center gap-2 rounded-full bg-[#1E3FE0] px-6 py-3 text-sm font-bold text-white transition hover:bg-[#12266E] disabled:opacity-50 dark:bg-[#60A5FA] dark:text-[#070B19]"
+        >
+          <FaPlus className="h-4 w-4" />
+          {savingRole ? "Creating..." : "Create Role"}
+        </button>
+      </motion.form>
+
+      <div className="rounded-2xl border border-black/10 bg-[#F6F1E4] shadow-lg dark:border-white/10 dark:bg-[#0D1B2A]">
+        <div className="border-b border-black/10 px-6 py-4 dark:border-white/10">
+          <h2 className="flex items-center gap-2 text-lg font-bold text-[#2A2A28] dark:text-white">
+            <FaIdBadge className="h-4 w-4 text-[#1E3FE0]" />
+            Org Roles
+          </h2>
+        </div>
+
+        {loading ? (
+          <div className="p-4">
+            <ListItemsSkeleton count={4} />
+          </div>
+        ) : orgRoles.length === 0 ? (
+          <div className="p-8 text-center text-sm text-[#6B6558] dark:text-slate-400">
+            No roles in the database yet.
+          </div>
+        ) : (
+          <ul className="divide-y divide-black/10 dark:divide-white/10">
+            {orgRoles.map((role) => (
+              <li key={role.key} className="px-6 py-4">
+                {editingRoleKey === role.key ? (
+                  <form onSubmit={handleUpdateRole} className="space-y-4">
+                    <div className="max-w-md">
+                      <label
+                        htmlFor={`edit-role-label-${role.key}`}
+                        className="mb-2 block text-xs font-bold uppercase tracking-wider text-[#6B6558]"
+                      >
+                        Label
+                      </label>
+                      <input
+                        id={`edit-role-label-${role.key}`}
+                        type="text"
+                        required
+                        value={editRoleLabel}
+                        onChange={(e) => setEditRoleLabel(e.target.value)}
+                        aria-label={`Edit label for ${role.key}`}
+                        className={inputClass}
+                      />
+                    </div>
+                    <SectionCheckboxGroup
+                      idPrefix={`edit-role-${role.key}`}
+                      selected={editRoleSections}
+                      onToggle={(section) =>
+                        toggleSection(section, editRoleSections, setEditRoleSections)
+                      }
+                    />
+                    <div className="flex flex-wrap gap-3">
+                      <button
+                        type="submit"
+                        disabled={savingRole}
+                        aria-label={`Save role ${role.key}`}
+                        className="rounded-full bg-[#1E3FE0] px-5 py-2.5 text-sm font-bold text-white disabled:opacity-50"
+                      >
+                        {savingRole ? "Saving..." : "Save Role"}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setEditingRoleKey(null)}
+                        aria-label="Cancel editing role"
+                        className="rounded-full border border-black/10 px-5 py-2.5 text-sm font-bold text-[#6B6558] dark:border-white/10"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </form>
+                ) : (
+                  <div className="flex flex-wrap items-start justify-between gap-4">
+                    <div>
+                      <div className="flex flex-wrap items-center gap-2">
+                        <p className="font-bold text-[#2A2A28] dark:text-white">{role.label}</p>
+                        <span className="rounded-full bg-black/5 px-2 py-0.5 text-[10px] font-bold uppercase text-[#6B6558] dark:bg-white/10 dark:text-slate-300">
+                          {role.key}
+                        </span>
+                        {role.isSystem && (
+                          <span className="rounded-full bg-[#1E3FE0]/10 px-2 py-0.5 text-[10px] font-bold uppercase text-[#1E3FE0]">
+                            Built-in
+                          </span>
+                        )}
+                        {role.isActive === false && (
+                          <span className="rounded-full bg-red-500/10 px-2 py-0.5 text-[10px] font-bold uppercase text-red-600">
+                            Inactive
+                          </span>
+                        )}
+                      </div>
+                      <div className="mt-2 flex flex-wrap gap-1.5">
+                        {(role.portalSections ?? []).map((section) => (
+                          <span
+                            key={`${role.key}-${section}`}
+                            className="rounded-full bg-[#10B981]/10 px-2 py-0.5 text-[10px] font-bold uppercase text-[#10B981]"
+                          >
+                            {GRANTABLE_PORTAL_SECTION_LABELS[section] ?? section}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                    {role.isActive !== false && (
+                      <div className="flex flex-wrap gap-2">
+                        <button
+                          type="button"
+                          onClick={() => openEditRole(role)}
+                          aria-label={`Edit role ${role.label}`}
+                          className="inline-flex items-center gap-2 rounded-full border border-[#1E3FE0]/20 px-4 py-2 text-xs font-bold text-[#1E3FE0] dark:text-[#60A5FA]"
+                        >
+                          <FaPen className="h-3 w-3" />
+                          Edit
+                        </button>
+                        {!role.isSystem && (
+                          <button
+                            type="button"
+                            onClick={() => handleDeactivateRole(role)}
+                            aria-label={`Deactivate role ${role.label}`}
+                            className="inline-flex items-center gap-2 rounded-full border border-red-500/20 px-4 py-2 text-xs font-bold text-red-600 dark:text-red-400"
+                          >
+                            <FaTrash className="h-3 w-3" />
+                            Deactivate
+                          </button>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
 
       {portalSettings && (
         <motion.form
@@ -475,7 +889,7 @@ export default function AuthorizedAdminsPage() {
           </p>
           <RoleCheckboxGroup
             idPrefix="add"
-            roles={ADMIN_ORG_ROLE_CHECKLIST}
+            roles={activeRoleChecklist}
             selected={selectedRoles}
             onToggle={(role) => toggleRole(role, selectedRoles, setSelectedRoles)}
             disabled={grantSuperAdmin}
@@ -500,37 +914,39 @@ export default function AuthorizedAdminsPage() {
             id="add-grant-security"
             label={GRANTABLE_PORTAL_SECTION_LABELS.SECURITY}
             description={
-              rolesGrantSecurityAccess(selectedRoles)
-                ? "Founder and Co-founder roles always include Portal Security."
+              rolesGrantSecurityAccess(selectedRoles, orgRoles)
+                ? "This role already includes Portal Security."
                 : "Allow this admin to view the Security evaluation page and reports."
             }
-            checked={grantSecurityAccess || rolesGrantSecurityAccess(selectedRoles) || grantSuperAdmin}
-            disabled={
-              grantSuperAdmin || rolesGrantSecurityAccess(selectedRoles)
+            checked={
+              grantSecurityAccess ||
+              rolesGrantSecurityAccess(selectedRoles, orgRoles) ||
+              grantSuperAdmin
             }
+            disabled={grantSuperAdmin || rolesGrantSecurityAccess(selectedRoles, orgRoles)}
             onChange={setGrantSecurityAccess}
           />
         </div>
 
         {!grantSuperAdmin && (
-        <div className="mt-4 max-w-xs">
-          <label htmlFor="new-admin-user-limit" className="mb-2 block text-xs font-bold uppercase tracking-wider text-[#6B6558]">
-            Student roster limit (optional)
-          </label>
-          <input
-            id="new-admin-user-limit"
-            type="number"
-            min={1}
-            value={userLimit}
-            onChange={(e) => setUserLimit(e.target.value)}
-            placeholder="Unlimited"
-            aria-label="Maximum students this admin can view in their roster"
-            className={inputClass}
-          />
-          <p className="mt-1 text-[10px] text-[#6B6558] dark:text-slate-400">
-            Per-admin cap on students shown in their roster. Leave blank for unlimited.
-          </p>
-        </div>
+          <div className="mt-4 max-w-xs">
+            <label htmlFor="new-admin-user-limit" className="mb-2 block text-xs font-bold uppercase tracking-wider text-[#6B6558]">
+              Student roster limit (optional)
+            </label>
+            <input
+              id="new-admin-user-limit"
+              type="number"
+              min={1}
+              value={userLimit}
+              onChange={(e) => setUserLimit(e.target.value)}
+              placeholder="Unlimited"
+              aria-label="Maximum students this admin can view in their roster"
+              className={inputClass}
+            />
+            <p className="mt-1 text-[10px] text-[#6B6558] dark:text-slate-400">
+              Per-admin cap on students shown in their roster. Leave blank for unlimited.
+            </p>
+          </div>
         )}
 
         <button
@@ -559,7 +975,7 @@ export default function AuthorizedAdminsPage() {
 
           <RoleCheckboxGroup
             idPrefix="edit"
-            roles={ADMIN_ORG_ROLE_CHECKLIST}
+            roles={activeRoleChecklist}
             selected={editRoles}
             onToggle={(role) => toggleRole(role, editRoles, setEditRoles)}
             disabled={editGrantSuperAdmin}
@@ -584,18 +1000,18 @@ export default function AuthorizedAdminsPage() {
               id="edit-grant-security"
               label={GRANTABLE_PORTAL_SECTION_LABELS.SECURITY}
               description={
-                rolesGrantSecurityAccess(editRoles)
-                  ? "Founder and Co-founder roles always include Portal Security."
+                rolesGrantSecurityAccess(editRoles, orgRoles)
+                  ? "This role already includes Portal Security."
                   : "Allow this admin to view the Security evaluation page and reports."
               }
               checked={
                 editGrantSecurityAccess ||
-                rolesGrantSecurityAccess(editRoles) ||
+                rolesGrantSecurityAccess(editRoles, orgRoles) ||
                 editGrantSuperAdmin
               }
               disabled={
                 editGrantSuperAdmin ||
-                rolesGrantSecurityAccess(editRoles) ||
+                rolesGrantSecurityAccess(editRoles, orgRoles) ||
                 (editingAdmin ? isPrimarySuperAdmin(editingAdmin) && editGrantSuperAdmin : false)
               }
               onChange={setEditGrantSecurityAccess}
@@ -603,21 +1019,21 @@ export default function AuthorizedAdminsPage() {
           </div>
 
           {!editGrantSuperAdmin && (
-          <div className="mt-4 max-w-xs">
-            <label htmlFor="edit-admin-user-limit" className="mb-2 block text-xs font-bold uppercase tracking-wider text-[#6B6558]">
-              Student roster limit (optional)
-            </label>
-            <input
-              id="edit-admin-user-limit"
-              type="number"
-              min={1}
-              value={editUserLimit}
-              onChange={(e) => setEditUserLimit(e.target.value)}
-              placeholder="Unlimited"
-              aria-label="Maximum students this admin can view in their roster"
-              className={inputClass}
-            />
-          </div>
+            <div className="mt-4 max-w-xs">
+              <label htmlFor="edit-admin-user-limit" className="mb-2 block text-xs font-bold uppercase tracking-wider text-[#6B6558]">
+                Student roster limit (optional)
+              </label>
+              <input
+                id="edit-admin-user-limit"
+                type="number"
+                min={1}
+                value={editUserLimit}
+                onChange={(e) => setEditUserLimit(e.target.value)}
+                placeholder="Unlimited"
+                aria-label="Maximum students this admin can view in their roster"
+                className={inputClass}
+              />
+            </div>
           )}
 
           <div className="mt-4 flex flex-wrap gap-3">
@@ -679,13 +1095,23 @@ export default function AuthorizedAdminsPage() {
                   <p className="mt-1 text-xs text-[#6B6558] dark:text-slate-400">
                     {admin.name || "No name"} · Added by {admin.addedByEmail || "system"}
                   </p>
+                  <div className="mt-1.5 flex flex-wrap gap-x-4 gap-y-1 text-[11px] font-medium text-[#6B6558] dark:text-slate-400">
+                    <p>
+                      <span className="font-bold text-[#2A2A28] dark:text-slate-200">Last login:</span>{" "}
+                      {formatAdminSessionTime(admin.lastLoginAt, admin.timezone)}
+                    </p>
+                    <p>
+                      <span className="font-bold text-[#2A2A28] dark:text-slate-200">Last logout:</span>{" "}
+                      {formatAdminSessionTime(admin.lastLogoutAt, admin.timezone)}
+                    </p>
+                  </div>
                   <div className="mt-2 flex flex-wrap gap-1.5">
                     {(admin.roles ?? []).map((role) => (
                       <span
                         key={role}
                         className="rounded-full bg-[#1E3FE0]/10 px-2 py-0.5 text-[10px] font-bold uppercase text-[#1E3FE0] dark:bg-[#60A5FA]/15 dark:text-[#60A5FA]"
                       >
-                        {getOrgRoleLabel(role)}
+                        {getOrgRoleLabel(role, orgRoles)}
                       </span>
                     ))}
                     {adminCanViewSecurity(admin) && (
@@ -714,15 +1140,15 @@ export default function AuthorizedAdminsPage() {
                       Edit
                     </button>
                     {!isPrimarySuperAdmin(admin) && (
-                    <button
-                      type="button"
-                      onClick={() => handleRemove(admin.email)}
-                      aria-label={`Revoke access for ${admin.email}`}
-                      className="inline-flex items-center gap-2 rounded-full border border-red-500/20 px-4 py-2 text-xs font-bold text-red-600 transition hover:bg-red-500/10 dark:text-red-400"
-                    >
-                      <FaTrash className="h-3 w-3" />
-                      Revoke
-                    </button>
+                      <button
+                        type="button"
+                        onClick={() => handleRemove(admin.email)}
+                        aria-label={`Revoke access for ${admin.email}`}
+                        className="inline-flex items-center gap-2 rounded-full border border-red-500/20 px-4 py-2 text-xs font-bold text-red-600 transition hover:bg-red-500/10 dark:text-red-400"
+                      >
+                        <FaTrash className="h-3 w-3" />
+                        Revoke
+                      </button>
                     )}
                   </div>
                 )}

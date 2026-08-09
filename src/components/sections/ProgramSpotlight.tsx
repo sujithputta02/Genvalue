@@ -36,7 +36,7 @@ export function ProgramSpotlight() {
         viewport={{ once: true, margin: "-40px" }}
         transition={{ duration: 0.6 }}
       >
-        <LiquidGlassContainer className="grid grid-cols-1 items-center gap-12 rounded-3xl p-8 lg:grid-cols-2 lg:p-12">
+        <LiquidGlassContainer className="grid grid-cols-1 items-center gap-8 rounded-3xl p-5 sm:gap-10 sm:p-8 lg:grid-cols-2 lg:gap-12 lg:p-12">
           <motion.div
             className="relative mx-auto w-full max-w-md lg:mx-0 lg:max-w-none"
             initial={false}
@@ -82,7 +82,7 @@ export function ProgramSpotlight() {
             <div className="mt-8 flex flex-col items-stretch justify-center gap-3 sm:flex-row sm:justify-start">
               <EnrollNowLink
                 aria-label="Enroll in AI Tools Mastery program"
-                className="inline-flex min-h-12 items-center justify-center rounded-full bg-[#E8622E] px-8 text-sm font-bold uppercase tracking-wider text-white shadow-lg transition hover:bg-[#d55321] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#E8622E]"
+                className="inline-flex min-h-12 w-full items-center justify-center rounded-full bg-[#E8622E] px-8 text-sm font-bold uppercase tracking-wider text-white shadow-lg transition hover:bg-[#d55321] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#E8622E] sm:w-auto"
               >
                 Enroll Now
               </EnrollNowLink>

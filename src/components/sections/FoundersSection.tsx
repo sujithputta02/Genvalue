@@ -46,6 +46,7 @@ function founderBadgeLabel(founder: Founder): string {
   if (role.includes("chief technology") || /(^|[^a-z])cto([^a-z]|$)/.test(role)) return "CTO";
   if (role.includes("chief product") || /(^|[^a-z])cpo([^a-z]|$)/.test(role)) return "CPO";
   if (role.includes("founder")) return "Founder";
+  if (role.includes("employee")) return "Employee";
   return founder.role.split("&")[0]?.trim() || "Team";
 }
 
@@ -71,6 +72,7 @@ function FounderPhoto({ founder }: { founder: Founder }) {
           alt={`Portrait of ${founder.name}`}
           fill
           className="rounded-full object-cover"
+          style={founder.photoPosition ? { objectPosition: founder.photoPosition } : undefined}
           sizes="(max-width: 639px) 112px, 128px"
           onError={onError}
         />
@@ -84,12 +86,12 @@ function DegreeRow({ degree }: { degree: Degree }) {
   return (
     <div className="flex items-start gap-2.5 rounded-xl border border-black/5 bg-white/70 px-3.5 py-2.5 dark:border-white/5 dark:bg-white/5">
       <GiGraduateCap className="mt-0.5 h-5 w-5 shrink-0 text-[#1E3FE0] dark:text-[#60A5FA]" aria-hidden="true" />
-      <p className="min-w-0 text-xs font-semibold text-[#2A2A28] dark:text-slate-200 sm:text-sm">
+      <p className="min-w-0 break-words text-xs font-semibold leading-snug text-[#2A2A28] dark:text-slate-200 sm:text-sm">
         <span className="font-extrabold text-[#1E3FE0] dark:text-[#60A5FA]">{abbr}</span>
         <span className="opacity-40"> · </span>
         <span>{degree.field}</span>
         <span className="opacity-40"> · </span>
-        <span>{degree.institution}</span>
+        <span className="inline sm:inline">{degree.institution}</span>
         <span className="opacity-40"> · </span>
         <span aria-hidden="true">{countryFlag(degree.country)}</span>
       </p>
@@ -112,7 +114,7 @@ function FounderCard({
   return (
     <motion.article
       className={`group/card flex h-full flex-col justify-between rounded-[20px] border border-black/10 bg-[#F6F1E4] shadow-lg transition-transform duration-300 hover:scale-[1.01] dark:border-white/10 dark:bg-[#0D1B2A] ${
-        spacious ? "p-7 sm:p-9 lg:p-10" : "p-6 sm:p-8"
+        spacious ? "p-5 sm:p-7 lg:p-10" : "p-5 sm:p-6 lg:p-8"
       }`}
       initial={{ opacity: 0, y: 30 }}
       whileInView={{ opacity: 1, y: 0 }}
@@ -223,23 +225,24 @@ export function FoundersSection({ id, variant = "default" }: FoundersSectionProp
     ? founders.filter((f) => f.id === "onarjae-bonhometre" || f.id === "sathvik-putta")
     : founders;
   const topRow = people.slice(0, 2);
-  const bottomRow = people.slice(2);
+  const midRow = people.slice(2, 5);
+  const lowerRow = people.slice(5);
 
   return (
     <section
       id={id}
-      className={`mx-auto px-4 py-20 sm:px-6 lg:px-8 ${
+      className={`mx-auto px-4 py-14 sm:px-6 sm:py-20 lg:px-8 ${
         isAbout ? "max-w-[1500px]" : "max-w-[1400px]"
       }`}
       aria-labelledby="founders-heading"
     >
-      <header className="mb-14 text-center">
+      <header className="mb-10 text-center sm:mb-14">
         <span className="font-annotation inline-block -rotate-2 text-sm font-bold uppercase tracking-wider text-[#6B6558] dark:text-slate-400">
           ★ LEADERSHIP & INSTRUCTION
         </span>
         <h2
           id="founders-heading"
-          className="font-display-custom mt-2 text-balance text-3xl font-extrabold tracking-tight text-[#2A2A28] dark:text-white sm:text-5xl"
+          className="font-display-custom mt-2 text-balance text-2xl font-extrabold tracking-tight text-[#2A2A28] dark:text-white sm:text-4xl md:text-5xl"
         >
           Built by practitioners, not theorists.
         </h2>
@@ -256,7 +259,7 @@ export function FoundersSection({ id, variant = "default" }: FoundersSectionProp
           ))}
         </div>
       ) : (
-        /* Team (default): pyramid — 2 centered over 3 equal cards */
+        /* Team (default): pyramid — founders, then CPO/CTO row, then employees */
         <div className="flex flex-col gap-8">
           <div className="mx-auto grid w-full grid-cols-1 gap-8 sm:max-w-xl md:max-w-none md:grid-cols-2 lg:w-[calc(((100%-4rem)*2/3)+2rem)] lg:max-w-none lg:gap-8">
             {topRow.map((founder, index) => (
@@ -264,10 +267,30 @@ export function FoundersSection({ id, variant = "default" }: FoundersSectionProp
             ))}
           </div>
 
-          {bottomRow.length > 0 ? (
+          {midRow.length > 0 ? (
             <div className="grid grid-cols-1 gap-8 sm:mx-auto sm:max-w-xl md:mx-0 md:max-w-none md:grid-cols-2 lg:grid-cols-3 lg:gap-8">
-              {bottomRow.map((founder, index) => (
+              {midRow.map((founder, index) => (
                 <FounderCard key={founder.id} founder={founder} index={topRow.length + index} />
+              ))}
+            </div>
+          ) : null}
+
+          {lowerRow.length > 0 ? (
+            <div
+              className={`mx-auto grid w-full grid-cols-1 gap-8 ${
+                lowerRow.length === 1
+                  ? "sm:max-w-xl md:max-w-xl"
+                  : lowerRow.length === 2
+                    ? "sm:max-w-xl md:max-w-none md:grid-cols-2 lg:w-[calc(((100%-4rem)*2/3)+2rem)]"
+                    : "sm:max-w-xl md:max-w-none md:grid-cols-2 lg:grid-cols-3"
+              }`}
+            >
+              {lowerRow.map((founder, index) => (
+                <FounderCard
+                  key={founder.id}
+                  founder={founder}
+                  index={topRow.length + midRow.length + index}
+                />
               ))}
             </div>
           ) : null}

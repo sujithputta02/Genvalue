@@ -55,16 +55,16 @@ export default function QuizPlayerPage({
         <FaArrowLeft className="h-3 w-3" /> Back to Quizzes
       </Link>
 
-      <div className="rounded-3xl border border-black/10 bg-[#F6F1E4] p-6 shadow-xl dark:border-white/10 dark:bg-[#0D1B2A] sm:p-8">
-        <div className="flex items-center justify-between border-b border-black/10 pb-4 dark:border-white/10">
-          <div>
+      <div className="rounded-2xl border border-black/10 bg-[#F6F1E4] p-4 shadow-xl dark:border-white/10 dark:bg-[#0D1B2A] sm:rounded-3xl sm:p-8">
+        <div className="flex flex-col gap-3 border-b border-black/10 pb-4 dark:border-white/10 sm:flex-row sm:items-center sm:justify-between">
+          <div className="min-w-0">
             <span className="font-annotation text-xs font-bold text-[#E8622E]">★ TIMED ASSESSMENT</span>
-            <h1 className="font-display-custom mt-1 text-xl font-extrabold text-[#2A2A28] dark:text-white sm:text-2xl">
+            <h1 className="font-display-custom mt-1 text-lg font-extrabold text-[#2A2A28] dark:text-white sm:text-2xl">
               {quiz.title}
             </h1>
           </div>
 
-          <div className="flex items-center gap-2 rounded-full border border-black/10 bg-white/70 px-4 py-2 text-xs font-bold text-[#1E3FE0] dark:border-white/10 dark:bg-white/5 dark:text-[#60A5FA]">
+          <div className="inline-flex w-fit shrink-0 items-center gap-2 rounded-full border border-black/10 bg-white/70 px-3 py-2 text-xs font-bold text-[#1E3FE0] dark:border-white/10 dark:bg-white/5 dark:text-[#60A5FA] sm:px-4">
             <FaClock className="h-3.5 w-3.5" />
             <span>Question {currentIdx + 1} of {quiz.questions.length}</span>
           </div>
@@ -84,7 +84,7 @@ export default function QuizPlayerPage({
               You scored {score}% (Pass Requirement: {quiz.passScore}%). Your attempt has been logged.
             </p>
 
-            <div className="mt-6 flex justify-center gap-3">
+            <div className="mt-6 flex flex-col justify-center gap-3 sm:flex-row">
               <button
                 type="button"
                 onClick={() => {
@@ -98,7 +98,7 @@ export default function QuizPlayerPage({
               </button>
               <Link
                 href="/dashboard/quizzes"
-                className="rounded-full bg-[#1E3FE0] px-6 py-3 text-xs font-bold uppercase tracking-wider text-white shadow-md dark:bg-[#60A5FA] dark:text-[#070B19]"
+                className="rounded-full bg-[#1E3FE0] px-6 py-3 text-center text-xs font-bold uppercase tracking-wider text-white shadow-md dark:bg-[#60A5FA] dark:text-[#070B19]"
               >
                 Return to Quizzes
               </Link>

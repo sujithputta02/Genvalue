@@ -17,21 +17,21 @@ export function authorInitials(name: string): string {
 
 const CATEGORY_BADGE: Record<string, string> = {
   Marketing:
-    "bg-rose-500/15 text-rose-800 ring-rose-500/25 dark:bg-rose-500/20 dark:text-rose-200 dark:ring-rose-400/30",
+    "bg-[#E8622E]/15 text-[#B45309] ring-[#E8622E]/25 dark:bg-[#E8622E]/20 dark:text-[#FDBA74] dark:ring-[#E8622E]/35",
   "General AI":
-    "bg-sky-500/15 text-sky-800 ring-sky-500/25 dark:bg-sky-500/20 dark:text-sky-200 dark:ring-sky-400/30",
+    "bg-[#1E3FE0]/12 text-[#12266E] ring-[#1E3FE0]/25 dark:bg-[#1E3FE0]/25 dark:text-[#93C5FD] dark:ring-[#60A5FA]/35",
   "AI Agents":
-    "bg-violet-500/15 text-violet-800 ring-violet-500/25 dark:bg-violet-500/20 dark:text-violet-200 dark:ring-violet-400/30",
+    "bg-[#12266E]/12 text-[#12266E] ring-[#12266E]/20 dark:bg-[#12266E]/40 dark:text-[#BFDBFE] dark:ring-[#60A5FA]/30",
   Automation:
-    "bg-amber-500/15 text-amber-900 ring-amber-500/25 dark:bg-amber-500/20 dark:text-amber-100 dark:ring-amber-400/30",
+    "bg-[#F59E0B]/15 text-[#92400E] ring-[#F59E0B]/30 dark:bg-[#F59E0B]/20 dark:text-[#FCD34D] dark:ring-[#FBBF24]/35",
   Strategy:
-    "bg-emerald-500/15 text-emerald-900 ring-emerald-500/25 dark:bg-emerald-500/20 dark:text-emerald-100 dark:ring-emerald-400/30",
+    "bg-[#10B981]/15 text-[#065F46] ring-[#10B981]/25 dark:bg-[#10B981]/20 dark:text-[#6EE7B7] dark:ring-[#34D399]/35",
 };
 
 export function categoryBadgeClass(category: string): string {
   return (
     CATEGORY_BADGE[category] ??
-    "bg-zinc-500/15 text-zinc-800 ring-zinc-500/20 dark:bg-zinc-500/20 dark:text-zinc-200 dark:ring-zinc-400/25"
+    "bg-[#2A2A28]/8 text-[#2A2A28] ring-[#2A2A28]/15 dark:bg-white/10 dark:text-slate-200 dark:ring-white/20"
   );
 }
 

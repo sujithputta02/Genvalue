@@ -65,7 +65,7 @@ export function InfiniteTestimonialMarquee() {
           {[...TESTIMONIALS, ...TESTIMONIALS].map((t, idx) => (
             <article
               key={`t-${t.author}-${idx}`}
-              className="flex w-[340px] shrink-0 flex-col justify-between rounded-2xl border border-black/10 bg-[#F6F1E4] p-6 shadow-xl dark:border-white/10 dark:bg-[#0D1B2A] sm:w-[380px]"
+              className="flex w-[min(100%,300px)] shrink-0 flex-col justify-between rounded-2xl border border-black/10 bg-[#F6F1E4] p-5 shadow-xl dark:border-white/10 dark:bg-[#0D1B2A] sm:w-[380px] sm:p-6"
             >
               <div>
                 <div className="flex items-center justify-between">

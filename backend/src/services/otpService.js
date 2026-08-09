@@ -6,8 +6,15 @@ import {
   buildAdminOtpEmailText,
 } from "../templates/adminOtpEmail.js";
 import { createAdminSessionToken } from "../utils/adminSession.js";
-import { normalizePortalSections } from "../constants/adminPortalRoles.js";
-import { sendAdminLoginAlertEmail } from "../utils/adminLoginAlert.js";
+import {
+  getEffectivePortalSections,
+  normalizePortalSections,
+} from "../constants/adminPortalRoles.js";
+import { ensureAdminOrgRoleCache } from "./adminOrgRoleStore.js";
+import {
+  normalizeIanaTimeZone,
+  sendAdminLoginAlertEmail,
+} from "../utils/adminLoginAlert.js";
 
 const OTP_EXPIRY_MINUTES = 10;
 const MAX_REQUESTS_PER_WINDOW = 5;
@@ -329,6 +336,8 @@ export async function verifyAdminOtp(rawEmail, rawOtp, loginContext = {}) {
 
   await deleteAllOtpsForEmail(email);
 
+  await ensureAdminOrgRoleCache();
+
   const adminRoles = authorizedAdmin.roles?.length
     ? authorizedAdmin.roles
     : authorizedAdmin.isSuperAdmin
@@ -336,6 +345,11 @@ export async function verifyAdminOtp(rawEmail, rawOtp, loginContext = {}) {
       : [];
   const adminUserLimit = authorizedAdmin.isSuperAdmin ? null : authorizedAdmin.userLimit;
   const adminPortalSections = normalizePortalSections(authorizedAdmin.portalSections);
+  const effectivePortalSections = getEffectivePortalSections({
+    isSuperAdmin: authorizedAdmin.isSuperAdmin,
+    roles: adminRoles,
+    portalSections: adminPortalSections,
+  });
 
   const adminToken = createAdminSessionToken({
     userId: dbUser.id,
@@ -349,6 +363,22 @@ export async function verifyAdminOtp(rawEmail, rawOtp, loginContext = {}) {
   });
 
   const loginAt = new Date();
+  const resolvedTimeZone =
+    normalizeIanaTimeZone(loginContext.timeZone) ||
+    normalizeIanaTimeZone(authorizedAdmin.timezone) ||
+    null;
+
+  prisma.authorizedAdmin
+    .update({
+      where: { email },
+      data: {
+        lastLoginAt: loginAt,
+        ...(resolvedTimeZone ? { timezone: resolvedTimeZone } : {}),
+      },
+    })
+    .catch((error) => {
+      console.warn("[otpService] could not persist admin login metadata:", error.message);
+    });
 
   sendAdminLoginAlertEmail({
     email,
@@ -358,6 +388,7 @@ export async function verifyAdminOtp(rawEmail, rawOtp, loginContext = {}) {
     ipAddress: loginContext.ipAddress,
     userAgent: loginContext.userAgent,
     loginAt,
+    timeZone: resolvedTimeZone,
   }).catch((error) => {
     console.warn("[otpService] admin login alert email error:", error.message);
   });
@@ -374,6 +405,7 @@ export async function verifyAdminOtp(rawEmail, rawOtp, loginContext = {}) {
       isSuperAdmin: authorizedAdmin.isSuperAdmin,
       roles: adminRoles,
       portalSections: adminPortalSections,
+      effectivePortalSections,
       userLimit: adminUserLimit,
       adminToken,
     },

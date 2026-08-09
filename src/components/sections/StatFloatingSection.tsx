@@ -100,7 +100,7 @@ export function StatFloatingSection() {
   return (
     <div ref={containerRef} className="relative w-full">
       <section
-        className="relative flex min-h-[70vh] w-full flex-col items-center justify-center overflow-hidden bg-[#12266E] py-28 text-center text-white"
+        className="relative flex min-h-[56vh] w-full flex-col items-center justify-center overflow-hidden bg-[#12266E] px-4 py-16 text-center text-white sm:min-h-[70vh] sm:py-24 md:py-28"
         aria-labelledby="stat-heading"
       >
         {/* Blueprint Grid Lines Overlay */}
@@ -159,7 +159,7 @@ export function StatFloatingSection() {
           </span>
           <h2
             id="stat-heading"
-            className="font-display-custom mt-3 text-center text-5xl font-extrabold tracking-tight text-white sm:text-6xl md:text-7xl lg:text-8xl"
+            className="font-display-custom mt-3 text-center text-3xl font-extrabold tracking-tight text-white sm:text-5xl md:text-7xl lg:text-8xl"
           >
             {toolsCount}+ AI Tools
           </h2>

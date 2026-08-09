@@ -136,17 +136,17 @@ export default function StudentCoursesPage() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="flex flex-col justify-between rounded-3xl border border-black/10 bg-[#F6F1E4] p-6 shadow-2xl dark:border-white/10 dark:bg-[#0D1B2A] sm:p-8"
+          className="flex flex-col justify-between rounded-2xl border border-black/10 bg-[#F6F1E4] p-4 shadow-2xl dark:border-white/10 dark:bg-[#0D1B2A] sm:rounded-3xl sm:p-8"
         >
           <div>
-            <div className="flex items-center justify-between">
+            <div className="flex flex-wrap items-center justify-between gap-2">
               <span className="rounded-full bg-[#1E3FE0]/10 px-3 py-1 text-[10px] font-extrabold uppercase text-[#1E3FE0] dark:bg-[#60A5FA]/20 dark:text-[#60A5FA]">
                 {enrollment.duration}
               </span>
-              <span className="text-xs font-bold text-[#10B981]">ACTIVE ENROLLMENT</span>
+              <span className="text-[10px] font-bold text-[#10B981] sm:text-xs">ACTIVE ENROLLMENT</span>
             </div>
 
-            <h2 className="font-display-custom mt-4 text-2xl font-extrabold text-[#2A2A28] dark:text-white">
+            <h2 className="font-display-custom mt-4 text-xl font-extrabold text-[#2A2A28] dark:text-white sm:text-2xl">
               {enrollment.courseName}
             </h2>
             <p className="mt-2 text-xs font-medium leading-relaxed text-[#6B6558] dark:text-slate-300">
@@ -161,18 +161,18 @@ export default function StudentCoursesPage() {
               <div className="mt-2 h-2.5 w-full overflow-hidden rounded-full bg-black/10 dark:bg-white/10">
                 <div className="h-full bg-[#1E3FE0] dark:bg-[#60A5FA]" style={{ width: `${progress.overallProgress}%` }} />
               </div>
-              <div className="mt-3 grid grid-cols-3 gap-2 text-center">
-                <div className="rounded-lg bg-white/40 p-2 dark:bg-white/5">
-                  <p className="text-[10px] font-bold text-[#6B6558] dark:text-slate-400">Lessons</p>
-                  <p className="text-sm font-extrabold text-[#2A2A28] dark:text-white">{progress.completedLessons}/{progress.totalLessons}</p>
+              <div className="mt-3 grid grid-cols-3 gap-1.5 text-center sm:gap-2">
+                <div className="rounded-lg bg-white/40 p-1.5 dark:bg-white/5 sm:p-2">
+                  <p className="text-[9px] font-bold text-[#6B6558] dark:text-slate-400 sm:text-[10px]">Lessons</p>
+                  <p className="text-xs font-extrabold text-[#2A2A28] dark:text-white sm:text-sm">{progress.completedLessons}/{progress.totalLessons}</p>
                 </div>
-                <div className="rounded-lg bg-white/40 p-2 dark:bg-white/5">
-                  <p className="text-[10px] font-bold text-[#6B6558] dark:text-slate-400">Modules</p>
-                  <p className="text-sm font-extrabold text-[#2A2A28] dark:text-white">{progress.completedModules}/{progress.totalModules}</p>
+                <div className="rounded-lg bg-white/40 p-1.5 dark:bg-white/5 sm:p-2">
+                  <p className="text-[9px] font-bold text-[#6B6558] dark:text-slate-400 sm:text-[10px]">Modules</p>
+                  <p className="text-xs font-extrabold text-[#2A2A28] dark:text-white sm:text-sm">{progress.completedModules}/{progress.totalModules}</p>
                 </div>
-                <div className="rounded-lg bg-white/40 p-2 dark:bg-white/5">
-                  <p className="text-[10px] font-bold text-[#6B6558] dark:text-slate-400">Status</p>
-                  <p className="text-sm font-extrabold text-[#2A2A28] dark:text-white">{progress.overallProgress}%</p>
+                <div className="rounded-lg bg-white/40 p-1.5 dark:bg-white/5 sm:p-2">
+                  <p className="text-[9px] font-bold text-[#6B6558] dark:text-slate-400 sm:text-[10px]">Status</p>
+                  <p className="text-xs font-extrabold text-[#2A2A28] dark:text-white sm:text-sm">{progress.overallProgress}%</p>
                 </div>
               </div>
             </div>

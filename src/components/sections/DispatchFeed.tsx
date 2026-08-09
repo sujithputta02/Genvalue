@@ -56,7 +56,7 @@ export function DispatchFeed() {
     >
       <div className="mb-8 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-end">
         <div>
-          <span className="font-annotation inline-block -rotate-1 text-xs font-bold uppercase tracking-widest text-[#1E3FE0]">
+          <span className="font-annotation inline-block -rotate-1 text-xs font-bold uppercase tracking-widest text-[#E8622E]">
             ★ THE GENVALUE DISPATCH
           </span>
           <h2
@@ -73,7 +73,7 @@ export function DispatchFeed() {
         </div>
         <Link
           href={activeTag ? blogTagHref(activeTag) : "/blog"}
-          className="inline-flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-[#1E3FE0] transition hover:text-[#12266E] dark:text-[#60A5FA] dark:hover:text-white"
+          className="inline-flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-[#1E3FE0] transition hover:text-[#12266E] visited:text-[#1E3FE0] dark:text-[#60A5FA] dark:hover:text-white dark:visited:text-[#60A5FA]"
           aria-label={activeTag ? `View all posts tagged ${activeTag}` : "View all dispatches"}
         >
           {activeTag ? "View all on Dispatch" : "View all dispatches"}
@@ -97,7 +97,7 @@ export function DispatchFeed() {
             <button
               type="button"
               onClick={() => setActiveTag(null)}
-              className="mt-3 text-xs font-bold text-[#1E3FE0] dark:text-[#60A5FA]"
+              className="mt-3 text-xs font-bold text-[#E8622E] hover:text-[#d55321] dark:text-[#E8622E]"
               aria-label="Clear tag filter"
             >
               Clear filter
@@ -111,16 +111,16 @@ export function DispatchFeed() {
           {[0, 1, 2].map((i) => (
             <div
               key={i}
-              className="h-72 animate-pulse rounded-2xl border border-black/5 bg-black/5 dark:border-white/10 dark:bg-white/5"
+              className="h-72 animate-pulse rounded-2xl border border-black/10 bg-[#F6F1E4] dark:border-white/10 dark:bg-[#0D1B2A]"
             />
           ))}
         </div>
       ) : error ? (
-        <p className="rounded-2xl border border-dashed border-black/10 px-6 py-10 text-center text-sm text-[#6B6558] dark:border-white/10 dark:text-slate-400">
+        <p className="rounded-2xl border border-dashed border-black/10 bg-[#F6F1E4]/60 px-6 py-10 text-center text-sm text-[#6B6558] dark:border-white/10 dark:bg-[#0D1B2A]/60 dark:text-slate-400">
           {error}
         </p>
       ) : posts.length === 0 ? (
-        <p className="rounded-2xl border border-dashed border-black/10 px-6 py-10 text-center text-sm text-[#6B6558] dark:border-white/10 dark:text-slate-400">
+        <p className="rounded-2xl border border-dashed border-black/10 bg-[#F6F1E4]/60 px-6 py-10 text-center text-sm text-[#6B6558] dark:border-white/10 dark:bg-[#0D1B2A]/60 dark:text-slate-400">
           No dispatches found for this tag yet.{" "}
           <button type="button" onClick={() => setActiveTag(null)} className="font-bold text-[#1E3FE0]">
             Show all
@@ -135,7 +135,7 @@ export function DispatchFeed() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-40px" }}
               transition={{ duration: 0.45, delay: index * 0.08 }}
-              className="group flex flex-col overflow-hidden rounded-2xl border border-black/10 bg-white shadow-lg dark:border-white/10 dark:bg-[#0D1B2A]"
+              className="group flex flex-col overflow-hidden rounded-2xl border border-black/10 bg-[#F6F1E4] shadow-lg dark:border-white/10 dark:bg-[#0D1B2A]"
             >
               <Link href={`/blog/${post.slug}`} className="relative aspect-[16/10] overflow-hidden">
                 <Image
@@ -149,14 +149,17 @@ export function DispatchFeed() {
               <div className="flex flex-1 flex-col p-5">
                 <div className="flex items-center gap-2 text-xs font-semibold text-[#6B6558] dark:text-slate-400">
                   <span
-                    className="flex h-7 w-7 items-center justify-center rounded-full bg-[#1E3FE0] text-[10px] font-bold text-white"
+                    className="flex h-7 w-7 items-center justify-center rounded-full bg-[#12266E] text-[10px] font-bold text-white dark:bg-[#1E3FE0]"
                     aria-hidden
                   >
                     {authorInitials(post.author)}
                   </span>
                   <span className="font-bold text-[#2A2A28] dark:text-white">{post.author}</span>
                 </div>
-                <Link href={`/blog/${post.slug}`} className="mt-3 block flex-1">
+                <Link
+                  href={`/blog/${post.slug}`}
+                  className="mt-3 block flex-1 text-[#2A2A28] visited:text-[#2A2A28] dark:text-white dark:visited:text-white"
+                >
                   <h3 className="font-display-custom text-lg font-extrabold leading-snug text-[#2A2A28] transition group-hover:text-[#1E3FE0] dark:text-white dark:group-hover:text-[#60A5FA]">
                     {post.title}
                   </h3>
@@ -170,7 +173,9 @@ export function DispatchFeed() {
                   </div>
                 ) : null}
                 <div className="mt-4 flex items-center justify-between gap-2">
-                  <span className={`rounded-full px-2.5 py-0.5 text-[10px] font-bold ${categoryBadgeClass(post.category)}`}>
+                  <span
+                    className={`rounded-full px-2.5 py-0.5 text-[10px] font-bold ring-1 ring-inset ${categoryBadgeClass(post.category)}`}
+                  >
                     {post.category}
                   </span>
                   <time dateTime={post.date} className="text-xs font-semibold text-[#6B6558] dark:text-slate-500">

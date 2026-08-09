@@ -32,6 +32,32 @@ export async function ensureAuthorizedAdminSchema() {
   await prisma.$executeRawUnsafe(`
     ALTER TABLE authorized_admins ADD COLUMN IF NOT EXISTS "portalSections" STRING[] NOT NULL DEFAULT ARRAY[]::STRING[];
   `);
+
+  await prisma.$executeRawUnsafe(`
+    ALTER TABLE authorized_admins ADD COLUMN IF NOT EXISTS timezone STRING;
+  `);
+
+  await prisma.$executeRawUnsafe(`
+    ALTER TABLE authorized_admins ADD COLUMN IF NOT EXISTS "lastLoginAt" TIMESTAMP;
+  `);
+
+  await prisma.$executeRawUnsafe(`
+    ALTER TABLE authorized_admins ADD COLUMN IF NOT EXISTS "lastLogoutAt" TIMESTAMP;
+  `);
+
+  await prisma.$executeRawUnsafe(`
+    CREATE TABLE IF NOT EXISTS admin_org_roles (
+      id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
+      key STRING NOT NULL UNIQUE,
+      label STRING NOT NULL,
+      "portalSections" STRING[] NOT NULL DEFAULT ARRAY[]::STRING[],
+      "isActive" BOOL NOT NULL DEFAULT true,
+      "isSystem" BOOL NOT NULL DEFAULT false,
+      "sortOrder" INT NOT NULL DEFAULT 0,
+      "createdAt" TIMESTAMP NOT NULL DEFAULT current_timestamp(),
+      "updatedAt" TIMESTAMP NOT NULL DEFAULT current_timestamp()
+    );
+  `);
 }
 
 export async function ensureSuperAdminRecord() {

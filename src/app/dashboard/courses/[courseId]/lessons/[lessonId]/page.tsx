@@ -59,7 +59,7 @@ export default function LessonViewerPage({
         <button
           type="button"
           onClick={handleMarkComplete}
-          className={`inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-xs font-bold transition ${
+          className={`inline-flex w-full items-center justify-center gap-2 rounded-full px-5 py-2.5 text-xs font-bold transition sm:w-auto ${
             completed
               ? "bg-[#10B981] text-white"
               : "bg-[#1E3FE0] text-white hover:bg-[#1630aa] dark:bg-[#60A5FA] dark:text-[#070B19]"
@@ -72,9 +72,9 @@ export default function LessonViewerPage({
 
       {/* Video Player Container */}
       <div className="overflow-hidden rounded-3xl border border-black/15 bg-[#0D1B2A] shadow-2xl dark:border-white/15">
-        <div className="flex items-center justify-between border-b border-white/10 bg-[#12266E] px-5 py-3 text-xs font-bold text-white">
-          <span>{module.title}</span>
-          <span className="rounded-full bg-white/10 px-3 py-1">{lesson.duration}</span>
+        <div className="flex flex-col gap-2 border-b border-white/10 bg-[#12266E] px-4 py-3 text-xs font-bold text-white sm:flex-row sm:items-center sm:justify-between sm:px-5">
+          <span className="min-w-0 truncate">{module.title}</span>
+          <span className="w-fit shrink-0 rounded-full bg-white/10 px-3 py-1">{lesson.duration}</span>
         </div>
 
         <div className="relative aspect-[16/9] w-full bg-[#070B19]">

@@ -14,6 +14,8 @@ export interface Founder {
   role: string;
   title: string;
   photo: string;
+  /** CSS object-position for circular crops when default center crops the face oddly */
+  photoPosition?: string;
   bio: string[];
   degrees: Degree[];
   expertise: string[];
@@ -136,6 +138,8 @@ export const founders: Founder[] = [
     role: "Chief Product Officer & Instructor",
     title: "Senior Business Analyst · Data Science & Business Systems",
     photo: "/images/founders/Sandhya_profile.png",
+    // Shift crop down so forehead / hair stay inside the circle
+    photoPosition: "50% 22%",
     bio: [
       "Sandhya L serves as the Chief Product Officer and Instructor, bringing over five years of experience in business analysis, data science, and enterprise technology. She specializes in bridging the gap between business and technology by translating complex requirements into scalable, data-driven solutions.",
       "With expertise in Agile methodologies, SQL, Power BI, business systems analysis, and stakeholder collaboration, she combines analytical thinking with practical implementation to help organizations improve operational efficiency and deliver successful digital transformation initiatives.",
@@ -195,6 +199,72 @@ export const founders: Founder[] = [
     ],
     linkedin: "https://www.linkedin.com/in/sujith-putta-13257a322/",
     github: "https://github.com/sujithputta02",
+    email: "genvalue.academy@gmail.com",
+  },
+  {
+    id: "vishnu-swarup-pujari",
+    name: "Vishnu Swarup Pujari",
+    role: "Employee",
+    title: "Data Analyst & AI Engineer · Data Analytics · Generative AI · Full Stack Development",
+    photo: "/images/founders/Vishnu_profile.png",
+    bio: [
+      "Vishnu Swarup Pujari is a Data Analyst and AI-focused professional with experience in data analytics, AI engineering, and full-stack development. His work includes building ETL pipelines, developing Power BI dashboards, performing data validation and root cause analysis, and researching advanced Retrieval-Augmented Generation (RAG) systems. With experience across Python, SQL, machine learning, backend development, and cloud technologies, he brings together data and software engineering to build practical, intelligent applications.",
+    ],
+    degrees: [
+      {
+        level: "Master of Science",
+        field: "Computer Science",
+        institution: "University of South Florida",
+        country: "United States",
+      },
+    ],
+    expertise: [
+      "Data Analytics",
+      "Generative AI",
+      "Retrieval-Augmented Generation (RAG)",
+      "Machine Learning",
+      "SQL & Data Engineering",
+      "Power BI",
+      "Full Stack Development",
+    ],
+    linkedin: "https://www.linkedin.com/in/vishnu-swarup-pujari-ab76661b9/",
+    github: "https://github.com/vishnu322010326030",
+    email: "genvalue.academy@gmail.com",
+  },
+  {
+    id: "tejaswini-varampati",
+    name: "Tejaswini Varampati",
+    role: "Employee",
+    title: "Data Analyst & AI Enthusiast · Data Science · Machine Learning · Full-Stack Development",
+    photo: "/images/founders/Tejaswini_profile.png",
+    bio: [
+      "Tejaswini Varampati is a Computer Science graduate student at the University of South Florida with a focus on Data, AI, and software development. Her experience spans Data Analytics, Machine Learning, Python, SQL, and Full-Stack Development. She has worked on projects involving face detection and recognition, chatbots, machine learning classifiers, data science, and survey and quiz management systems. She has also contributed as a Student Ambassador and Student Placement Coordinator, gaining exposure to industry technologies and professional collaboration.",
+    ],
+    degrees: [
+      {
+        level: "Master of Science",
+        field: "Computer Science",
+        institution: "University of South Florida",
+        country: "United States",
+      },
+      {
+        level: "Bachelor of Technology",
+        field: "Computer Science · Data Science",
+        institution: "GITAM Deemed University",
+        country: "India",
+      },
+    ],
+    expertise: [
+      "Data Analytics",
+      "Machine Learning",
+      "Data Science",
+      "Full-Stack Development",
+      "Python",
+      "SQL",
+      "Cloud Storage",
+    ],
+    linkedin: "https://www.linkedin.com/in/tejaswini-varampati-6517a51b8/",
+    github: "https://github.com/vtejaswin1",
     email: "genvalue.academy@gmail.com",
   },
 ];

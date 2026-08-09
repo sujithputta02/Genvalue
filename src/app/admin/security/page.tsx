@@ -16,6 +16,7 @@ import {
   FaUserShield,
 } from "react-icons/fa6";
 import { SecurityPageSkeleton } from "@/components/skeletons";
+import { SecurityScanAnimation } from "@/components/admin/SecurityScanAnimation";
 import { useAdminPortalPath } from "@/hooks/useAdminPortalPath";
 import { getAdminProfile, getAdminSecurityReport } from "@/services/adminService";
 import type {
@@ -157,7 +158,20 @@ export default function AdminSecurityPage() {
   );
 
   if (loading) {
-    return <SecurityPageSkeleton />;
+    return (
+      <div className="space-y-6">
+        <div>
+          <span className="font-annotation text-xs font-bold uppercase tracking-widest text-[#10B981]">
+            ★ LEADERSHIP · PORTAL SECURITY
+          </span>
+          <h1 className="font-display-custom mt-1 text-2xl font-extrabold tracking-tight text-[#2A2A28] dark:text-white sm:text-3xl">
+            Security Evaluation
+          </h1>
+        </div>
+        <SecurityScanAnimation active label="Scanning portal controls…" />
+        <SecurityPageSkeleton />
+      </div>
+    );
   }
 
   const overall = report ? OVERALL_CONFIG[report.overallStatus] : null;
@@ -224,6 +238,11 @@ export default function AdminSecurityPage() {
 
       {report && overall ? (
         <>
+          <SecurityScanAnimation
+            active={refreshing}
+            label={refreshing ? "Re-scanning portal controls…" : "Security systems online"}
+          />
+
           <div className="rounded-3xl border border-black/10 bg-[#F6F1E4] p-5 shadow-xl dark:border-white/10 dark:bg-[#0D1B2A] sm:p-6">
             <div className="flex flex-wrap items-start justify-between gap-4">
               <div>

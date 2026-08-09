@@ -44,7 +44,7 @@ export default function InstructorsPage() {
           <span className="font-annotation inline-block -rotate-2 text-xs font-bold uppercase tracking-widest text-[#E8622E]">
             ★ EXPERT FACULTY
           </span>
-          <h1 className="font-display-custom mt-2 text-balance text-4xl font-extrabold tracking-tight text-[#2A2A28] dark:text-white sm:text-5xl md:text-6xl">
+          <h1 className="font-display-custom mt-2 text-balance text-3xl font-extrabold tracking-tight text-[#2A2A28] dark:text-white sm:text-5xl md:text-6xl">
             Instructors & Mentors
           </h1>
           <p className="mx-auto mt-4 max-w-2xl text-pretty text-base font-medium leading-relaxed text-[#6B6558] sm:text-lg dark:text-slate-300">
@@ -88,11 +88,11 @@ export default function InstructorsPage() {
             </h2>
           </div>
 
-          <div className="mt-8 grid gap-6 sm:grid-cols-3">
+          <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {TEACHING_PILLARS.map((pillar) => (
               <div
                 key={pillar.title}
-                className="flex flex-col justify-between rounded-2xl border border-black/10 bg-[#F6F1E4] p-6 shadow-xl dark:border-white/10 dark:bg-[#0D1B2A]"
+                className="flex flex-col justify-between rounded-2xl border border-black/10 bg-[#F6F1E4] p-5 shadow-xl dark:border-white/10 dark:bg-[#0D1B2A] sm:p-6"
               >
                 <div>
                   <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#1E3FE0] text-white shadow-md">

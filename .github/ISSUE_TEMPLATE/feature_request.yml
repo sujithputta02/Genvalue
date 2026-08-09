@@ -1,0 +1,45 @@
+name: Feature request
+description: Suggest an improvement or new capability
+title: "[Feature]: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Describe the problem you're solving before proposing a solution.
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: Who is affected and what is painful today?
+      placeholder: As a student / admin / instructor, I need…
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: What would success look like?
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Marketing site
+        - Student LMS
+        - Instructor portal
+        - Admin portal
+        - Backend / API
+        - Docs / DX
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Other approaches you thought about (optional)
+    validations:
+      required: false

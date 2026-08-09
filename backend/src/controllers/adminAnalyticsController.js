@@ -279,6 +279,8 @@ export async function listAdminUsers(req, res) {
               emailVerified: true,
               createdAt: true,
               lastLoginAt: true,
+              deactivatedUntil: true,
+              deactivationReason: true,
             },
             orderBy: { createdAt: "desc" },
             skip,
@@ -287,19 +289,27 @@ export async function listAdminUsers(req, res) {
         : [];
 
     const [totalStudents, newThisWeek, activeLast30Days, neverLoggedIn] = studentStats;
+    const now = Date.now();
 
     return res.json({
       success: true,
-      data: users.map((user) => ({
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-        authProvider: user.authProvider,
-        emailVerified: user.emailVerified,
-        createdAt: user.createdAt.toISOString(),
-        lastLoginAt: user.lastLoginAt?.toISOString() ?? null,
-      })),
+      data: users.map((user) => {
+        const until = user.deactivatedUntil;
+        const isDeactivated = Boolean(until && until.getTime() > now);
+        return {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          role: user.role,
+          authProvider: user.authProvider,
+          emailVerified: user.emailVerified,
+          createdAt: user.createdAt.toISOString(),
+          lastLoginAt: user.lastLoginAt?.toISOString() ?? null,
+          deactivatedUntil: until?.toISOString() ?? null,
+          deactivationReason: user.deactivationReason ?? null,
+          isDeactivated,
+        };
+      }),
       meta: {
         total: effectiveTotal,
         page: safePage,

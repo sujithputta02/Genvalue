@@ -179,7 +179,7 @@ export function StudentPlannerPanel({ onDataChange }: StudentPlannerPanelProps) 
   };
 
   const inputClass =
-    "w-full rounded-2xl border border-black/10 bg-white/60 px-4 py-3 text-sm font-medium text-[#2A2A28] outline-none focus:border-[#1E3FE0] dark:border-white/10 dark:bg-white/5 dark:text-white dark:focus:border-[#60A5FA]";
+    "w-full rounded-2xl border border-black/10 bg-white/60 px-4 py-3 text-base font-medium text-[#2A2A28] outline-none focus:border-[#1E3FE0] dark:border-white/10 dark:bg-white/5 dark:text-white dark:focus:border-[#60A5FA] sm:text-sm";
 
   const eventSummary =
     selectedEvents.length === 0
@@ -191,25 +191,27 @@ export function StudentPlannerPanel({ onDataChange }: StudentPlannerPanelProps) 
       <div className="flex flex-col gap-4 xl:flex-row xl:items-start">
         {/* Compact calendar widget */}
         <div
-          className="w-full max-w-[340px] shrink-0 overflow-hidden rounded-[1.75rem] border border-black/10 bg-[#0D1B2A] shadow-xl dark:border-white/10"
+          className="mx-auto w-full max-w-md shrink-0 overflow-hidden rounded-[1.75rem] border border-black/10 bg-[#0D1B2A] shadow-xl dark:border-white/10 sm:max-w-[340px] xl:mx-0"
           aria-label="Study planner calendar widget"
         >
-          <div className="flex min-h-[200px]">
-            {/* Left: selected day hero */}
-            <div className="flex w-[38%] flex-col justify-between border-r border-white/10 p-4">
+          <div className="flex min-h-0 flex-col sm:min-h-[200px] sm:flex-row">
+            {/* Selected day hero — horizontal on phone, side column on wider */}
+            <div className="flex w-full flex-row items-end justify-between gap-3 border-b border-white/10 p-4 sm:w-[38%] sm:flex-col sm:items-stretch sm:justify-between sm:border-b-0 sm:border-r">
               <div>
                 <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#E8622E]">
                   {selectedDate.toLocaleDateString(undefined, { weekday: "long" })}
                 </p>
-                <p className="font-display-custom mt-1 text-5xl font-light leading-none text-white">
+                <p className="font-display-custom mt-1 text-4xl font-light leading-none text-white sm:text-5xl">
                   {selectedDate.getDate()}
                 </p>
               </div>
-              <p className="text-[11px] font-medium text-white/45">{eventSummary}</p>
+              <p className="max-w-[45%] text-right text-[11px] font-medium text-white/45 sm:max-w-none sm:text-left">
+                {eventSummary}
+              </p>
             </div>
 
-            {/* Right: mini month grid */}
-            <div className="flex flex-1 flex-col p-3">
+            {/* Mini month grid */}
+            <div className="flex flex-1 flex-col p-3 sm:p-3">
               <div className="mb-2 flex items-center justify-between">
                 <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#E8622E]">
                   {month.toLocaleString(undefined, { month: "long" })}
@@ -221,7 +223,7 @@ export function StudentPlannerPanel({ onDataChange }: StudentPlannerPanelProps) 
                       setMonth(new Date(month.getFullYear(), month.getMonth() - 1, 1))
                     }
                     aria-label="Previous month"
-                    className="rounded-full p-1 text-white/50 hover:bg-white/10 hover:text-white"
+                    className="rounded-full p-1.5 text-white/50 hover:bg-white/10 hover:text-white sm:p-1"
                   >
                     <FaChevronLeft className="h-2.5 w-2.5" />
                   </button>
@@ -231,14 +233,14 @@ export function StudentPlannerPanel({ onDataChange }: StudentPlannerPanelProps) 
                       setMonth(new Date(month.getFullYear(), month.getMonth() + 1, 1))
                     }
                     aria-label="Next month"
-                    className="rounded-full p-1 text-white/50 hover:bg-white/10 hover:text-white"
+                    className="rounded-full p-1.5 text-white/50 hover:bg-white/10 hover:text-white sm:p-1"
                   >
                     <FaChevronRight className="h-2.5 w-2.5" />
                   </button>
                 </div>
               </div>
 
-              <div className="grid grid-cols-7 gap-0.5 text-center">
+              <div className="grid grid-cols-7 gap-0.5 text-center sm:gap-0.5">
                 {WEEK_HEADERS.map((label, index) => (
                   <span
                     key={`${label}-${index}`}
@@ -250,7 +252,7 @@ export function StudentPlannerPanel({ onDataChange }: StudentPlannerPanelProps) 
                 ))}
                 {cells.map((cell, index) => {
                   if (!cell) {
-                    return <span key={`e-${index}`} className="h-6" aria-hidden="true" />;
+                    return <span key={`e-${index}`} className="h-7 sm:h-6" aria-hidden="true" />;
                   }
 
                   const key = toDateKey(cell);
@@ -265,7 +267,7 @@ export function StudentPlannerPanel({ onDataChange }: StudentPlannerPanelProps) 
                       onClick={() => setSelectedDate(cell)}
                       aria-label={`${cell.toLocaleDateString()}${hasEvents ? ", has plans" : ""}`}
                       aria-pressed={isSelected}
-                      className={`relative flex h-6 w-6 items-center justify-center rounded-full text-[11px] font-medium transition ${
+                      className={`relative mx-auto flex h-7 w-7 items-center justify-center rounded-full text-[11px] font-medium transition sm:h-6 sm:w-6 ${
                         isSelected
                           ? "bg-[#E8622E] text-white"
                           : isToday
@@ -395,7 +397,7 @@ export function StudentPlannerPanel({ onDataChange }: StudentPlannerPanelProps) 
             initial={reduceMotion ? false : { opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={reduceMotion ? undefined : { opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm"
+            className="fixed inset-0 z-50 flex items-end justify-center bg-black/50 p-0 backdrop-blur-sm sm:items-center sm:p-4"
             onClick={() => !submitting && setModalOpen(false)}
             role="presentation"
           >
@@ -404,7 +406,7 @@ export function StudentPlannerPanel({ onDataChange }: StudentPlannerPanelProps) 
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={reduceMotion ? undefined : { opacity: 0, scale: 0.96, y: 12 }}
               onClick={(e) => e.stopPropagation()}
-              className="w-full max-w-md rounded-3xl border border-black/10 bg-[#F6F1E4] p-6 shadow-2xl dark:border-white/10 dark:bg-[#0D1B2A]"
+              className="max-h-[92dvh] w-full max-w-md overflow-y-auto rounded-t-3xl border border-black/10 bg-[#F6F1E4] p-5 shadow-2xl dark:border-white/10 dark:bg-[#0D1B2A] sm:rounded-3xl sm:p-6"
               role="dialog"
               aria-modal="true"
               aria-labelledby="planner-modal-title"

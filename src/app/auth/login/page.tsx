@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
-import { FaArrowRight, FaLock, FaEnvelope, FaShieldHalved } from "react-icons/fa6";
+import { FaArrowRight, FaLock, FaEnvelope } from "react-icons/fa6";
 import { loginWithEmail, loginWithGoogle, handleGoogleRedirectResult, storeLmsAuthSession, getLmsPortalRedirect, isAdminPortalToken } from "@/services/authService";
 import { clearAdminPortalSessionOnly } from "@/services/adminService";
 import { getStoredPortalSessionId } from "@/lib/lmsSession";
@@ -142,7 +142,7 @@ function LoginPageContent() {
   };
 
   return (
-    <div className="relative flex min-h-screen items-center justify-center bg-[#EDE6D3] px-4 py-16 text-[#2A2A28] dark:bg-[#070B19] dark:text-white">
+    <div className="relative flex min-h-dvh items-center justify-center overflow-x-hidden bg-[#EDE6D3] px-3 py-8 text-[#2A2A28] dark:bg-[#070B19] dark:text-white sm:px-4 sm:py-12 md:py-16">
       {/* Blueprint Grid Lines Overlay */}
       <div
         className="pointer-events-none absolute inset-0 opacity-[0.05] [background-image:linear-gradient(#000_1px,transparent_1px),linear-gradient(90deg,#000_1px,transparent_1px)] [background-size:24px_24px] dark:opacity-[0.07] dark:[background-image:linear-gradient(#fff_1px,transparent_1px),linear-gradient(90deg,#fff_1px,transparent_1px)]"
@@ -153,21 +153,21 @@ function LoginPageContent() {
         initial={{ opacity: 0, y: 24 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
-        className="relative z-10 w-full max-w-md rounded-3xl border border-black/10 bg-[#F6F1E4] p-8 shadow-2xl dark:border-white/10 dark:bg-[#0D1B2A] sm:p-10"
+        className="relative z-10 w-full max-w-md rounded-2xl border border-black/10 bg-[#F6F1E4] p-5 shadow-2xl dark:border-white/10 dark:bg-[#0D1B2A] sm:rounded-3xl sm:p-8 md:p-10"
       >
         {/* Brand Logo & Header */}
         <div className="text-center">
-          <Link href="/" className="inline-flex items-center gap-2">
-            <div className="relative h-10 w-10">
+          <Link href="/" className="inline-flex items-center gap-2" aria-label="GenValue home">
+            <div className="relative h-9 w-9 sm:h-10 sm:w-10">
               <Image src="/Genvalue Light.svg" alt="GenValue Logo" fill className="object-contain dark:hidden" priority />
               <Image src="/Genvalue Dark.svg" alt="GenValue Logo" fill className="hidden object-contain dark:block" priority />
             </div>
-            <span className="font-display-custom text-2xl font-extrabold tracking-tight">
+            <span className="font-display-custom text-xl font-extrabold tracking-tight sm:text-2xl">
               <span className="text-[#2A2A28] dark:text-white">Gen</span>
               <span className="text-[#1E3FE0] dark:text-[#60A5FA]">Value</span>
             </span>
           </Link>
-          <h1 className="font-display-custom mt-4 text-2xl font-extrabold tracking-tight sm:text-3xl">
+          <h1 className="font-display-custom mt-3 text-xl font-extrabold tracking-tight sm:mt-4 sm:text-3xl">
             Welcome Back
           </h1>
           <p className="mt-1 text-xs font-medium text-[#6B6558] dark:text-slate-400">
@@ -176,7 +176,7 @@ function LoginPageContent() {
         </div>
 
         {/* Login Form */}
-        <form onSubmit={handleSubmit} className="mt-6 space-y-4">
+        <form onSubmit={handleSubmit} className="mt-5 space-y-3.5 sm:mt-6 sm:space-y-4">
           {resetSuccess && (
             <div className="rounded-xl border border-[#10B981]/20 bg-[#10B981]/10 p-3 text-xs font-semibold text-[#0d9668] dark:text-[#10B981]">
               Password updated successfully. Sign in with your new password.
@@ -202,7 +202,7 @@ function LoginPageContent() {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="student@gmail.com"
                 autoComplete="email"
-                className="w-full rounded-2xl border border-black/10 bg-white pl-11 pr-4 py-3 text-sm font-medium outline-none transition focus:border-[#1E3FE0] dark:border-white/10 dark:bg-white/5 dark:focus:border-[#60A5FA]"
+                className="w-full rounded-2xl border border-black/10 bg-white py-3 pl-11 pr-4 text-base font-medium outline-none transition focus:border-[#1E3FE0] dark:border-white/10 dark:bg-white/5 dark:focus:border-[#60A5FA] sm:text-sm"
               />
             </div>
           </div>
@@ -220,12 +220,12 @@ function LoginPageContent() {
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
                 autoComplete="current-password"
-                className="w-full rounded-2xl border border-black/10 bg-white pl-11 pr-12 py-3 text-sm font-medium outline-none transition focus:border-[#1E3FE0] dark:border-white/10 dark:bg-white/5 dark:focus:border-[#60A5FA]"
+                className="w-full rounded-2xl border border-black/10 bg-white py-3 pl-11 pr-12 text-base font-medium outline-none transition focus:border-[#1E3FE0] dark:border-white/10 dark:bg-white/5 dark:focus:border-[#60A5FA] sm:text-sm"
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-4 top-3 text-[#6B6558] hover:text-[#2A2A28] dark:text-slate-400 dark:hover:text-white transition-colors"
+                className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-[#6B6558] transition-colors hover:text-[#2A2A28] dark:text-slate-400 dark:hover:text-white sm:right-4"
                 aria-label={showPassword ? "Hide password" : "Show password"}
               >
                 {showPassword ? (
@@ -286,10 +286,11 @@ function LoginPageContent() {
           <button
             type="submit"
             disabled={loading}
-            className="flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-[#E8622E] px-6 text-sm font-bold uppercase tracking-wider text-white shadow-xl transition hover:bg-[#d55321] disabled:opacity-50"
+            aria-label="Sign in to LMS portal"
+            className="flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-[#E8622E] px-5 text-xs font-bold uppercase tracking-wider text-white shadow-xl transition hover:bg-[#d55321] disabled:opacity-50 sm:px-6 sm:text-sm"
           >
             {loading ? "Signing In..." : "Sign In to Portal"}
-            <FaArrowRight className="h-3.5 w-3.5" />
+            <FaArrowRight className="h-3.5 w-3.5 shrink-0" />
           </button>
 
           <div className="relative my-6">
@@ -307,7 +308,8 @@ function LoginPageContent() {
             type="button"
             onClick={handleGoogleLogin}
             disabled={loading}
-            className="flex min-h-12 w-full items-center justify-center gap-3 rounded-full border border-black/10 bg-white px-6 text-sm font-bold text-[#2A2A28] shadow-md transition hover:bg-black/5 disabled:opacity-50 dark:border-white/10 dark:bg-white/10 dark:text-white dark:hover:bg-white/20"
+            aria-label="Sign in with Google"
+            className="flex min-h-12 w-full items-center justify-center gap-2 rounded-full border border-black/10 bg-white px-5 text-xs font-bold text-[#2A2A28] shadow-md transition hover:bg-black/5 disabled:opacity-50 dark:border-white/10 dark:bg-white/10 dark:text-white dark:hover:bg-white/20 sm:gap-3 sm:px-6 sm:text-sm"
           >
             <svg className="h-5 w-5" viewBox="0 0 24 24">
               <path

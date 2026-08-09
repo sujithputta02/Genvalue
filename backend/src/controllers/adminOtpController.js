@@ -30,7 +30,7 @@ export async function sendAdminOTP(req, res) {
 
 export async function verifyAdminOTP(req, res) {
   try {
-    const { email, otp } = req.body;
+    const { email, otp, timeZone } = req.body;
     const otpValue = String(otp ?? "").trim();
 
     if (!email?.trim() || !otpValue) {
@@ -43,6 +43,7 @@ export async function verifyAdminOTP(req, res) {
     const result = await verifyAdminOtp(email, otpValue, {
       ipAddress: getClientIpFromRequest(req),
       userAgent: req.headers["user-agent"],
+      timeZone,
     });
 
     return res.status(result.status).json({

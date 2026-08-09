@@ -136,7 +136,7 @@ function StatCard({
   const n = useCountUp(target, active);
   return (
     <article className="rounded-2xl border border-black/10 bg-[#F6F1E4] p-6 text-center shadow-xl dark:border-white/10 dark:bg-[#0D1B2A]">
-      <p className="font-display-custom text-4xl font-extrabold tabular-nums text-[#2A2A28] sm:text-5xl dark:text-white">
+      <p className="font-display-custom text-3xl font-extrabold tabular-nums text-[#2A2A28] sm:text-4xl md:text-5xl dark:text-white">
         <span className="text-[#E8622E]">{prefix}</span>
         {n}
         <span className="text-[#E8622E]">{suffix}</span>
@@ -165,21 +165,21 @@ export default function AboutPage() {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="grid grid-cols-1 items-center gap-12 rounded-3xl border border-black/10 bg-[#F6F1E4] p-8 shadow-2xl dark:border-white/10 dark:bg-[#0D1B2A] lg:grid-cols-2 lg:p-12"
+          className="grid grid-cols-1 items-center gap-8 rounded-3xl border border-black/10 bg-[#F6F1E4] p-5 shadow-2xl dark:border-white/10 dark:bg-[#0D1B2A] sm:gap-10 sm:p-8 lg:grid-cols-2 lg:gap-12 lg:p-12"
         >
           <div>
             <span className="font-annotation inline-block -rotate-2 text-xs font-bold uppercase tracking-widest text-[#E8622E]">
               ★ {course.instructor.academy}
             </span>
-            <h1 className="font-display-custom mt-2 text-balance text-4xl font-extrabold tracking-tight text-[#2A2A28] dark:text-white sm:text-5xl md:text-6xl">
+            <h1 className="font-display-custom mt-2 text-balance text-3xl font-extrabold tracking-tight text-[#2A2A28] dark:text-white sm:text-5xl md:text-6xl">
               About GenValue
             </h1>
-            <p className="mt-4 text-lg font-medium leading-relaxed text-[#6B6558] dark:text-slate-300">
+            <p className="mt-4 text-base font-medium leading-relaxed text-[#6B6558] dark:text-slate-300 sm:text-lg">
               {course.subtitle}
             </p>
           </div>
 
-          <div className="relative mx-auto w-full max-w-md lg:mx-0 lg:max-w-none">
+          <div className="relative mx-auto w-full max-w-md overflow-hidden lg:mx-0 lg:max-w-none">
             <div className="-rotate-2 overflow-hidden rounded-2xl border border-black/10 shadow-2xl ring-4 ring-[#1E3FE0]/20 dark:border-white/10 dark:ring-white/10">
               <Image
                 src="/images/poster/genvalue-poster.png"
@@ -201,16 +201,16 @@ export default function AboutPage() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className="rounded-3xl border border-black/10 bg-[#F6F1E4] p-8 shadow-xl dark:border-white/10 dark:bg-[#0D1B2A] lg:p-12"
+          className="rounded-3xl border border-black/10 bg-[#F6F1E4] p-5 shadow-xl dark:border-white/10 dark:bg-[#0D1B2A] sm:p-8 lg:p-12"
         >
           <span className="font-annotation inline-block -rotate-2 text-xs font-bold uppercase tracking-widest text-[#E8622E]">
             ★ OUR CORE PHILOSOPHY
           </span>
-          <h2 id="about-mission" className="font-display-custom mt-2 text-3xl font-extrabold text-[#2A2A28] dark:text-white sm:text-4xl">
+          <h2 id="about-mission" className="font-display-custom mt-2 text-2xl font-extrabold text-[#2A2A28] dark:text-white sm:text-3xl md:text-4xl">
             Our Mission
           </h2>
           <div className="mt-8 grid grid-cols-1 gap-10 lg:grid-cols-2 lg:items-center">
-            <blockquote className="border-l-4 border-[#1E3FE0] pl-6 text-2xl font-extrabold leading-snug text-[#2A2A28] dark:text-white sm:text-3xl">
+            <blockquote className="border-l-4 border-[#1E3FE0] pl-4 text-xl font-extrabold leading-snug text-[#2A2A28] dark:text-white sm:pl-6 sm:text-2xl md:text-3xl">
               We don&apos;t teach tools.{" "}
               <span className="text-[#1E3FE0] dark:text-[#60A5FA]">We teach judgment.</span>
             </blockquote>

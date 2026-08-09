@@ -20,17 +20,17 @@ function MediumPostCard({ post }: { post: Post }) {
 
   return (
     <article className="group flex flex-col justify-between border-b border-black/10 py-7 dark:border-white/10 sm:flex-row sm:items-center sm:gap-8">
-      <div className="flex-1">
+      <div className="min-w-0 flex-1">
         {/* Author Line */}
-        <div className="flex items-center gap-2.5 text-xs font-semibold text-[#6B6558] dark:text-slate-400">
+        <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1 text-xs font-semibold text-[#6B6558] dark:text-slate-400">
           <span
-            className="flex h-7 w-7 items-center justify-center rounded-full bg-[#1E3FE0] text-[10px] font-bold text-white shadow-sm"
+            className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#1E3FE0] text-[10px] font-bold text-white shadow-sm"
             aria-hidden
           >
             {authorInitials(post.author)}
           </span>
-          <span className="font-bold text-[#2A2A28] dark:text-white">{post.author}</span>
-          <span>·</span>
+          <span className="min-w-0 font-bold text-[#2A2A28] dark:text-white">{post.author}</span>
+          <span className="opacity-50">·</span>
           <time dateTime={post.date}>{formatPostDate(post.date)}</time>
         </div>
 
@@ -100,7 +100,7 @@ function HeroFeaturedCard({ post }: { post: Post }) {
             sizes="(max-width: 1024px) 100vw, 60vw"
           />
         </div>
-        <div className="flex flex-col justify-between p-8 lg:col-span-5 lg:p-10">
+        <div className="flex flex-col justify-between p-5 sm:p-8 lg:col-span-5 lg:p-10">
           <div>
             <span className="font-annotation inline-block -rotate-2 text-xs font-bold uppercase tracking-widest text-[#E8622E]">
               ★ FEATURED COVER STORY
@@ -173,25 +173,25 @@ export function BlogListing({ posts, initialTag }: Props) {
       />
 
       {/* Publication Header */}
-      <header className="relative border-b border-black/10 py-16 text-center dark:border-white/10">
+      <header className="relative border-b border-black/10 py-10 text-center dark:border-white/10 sm:py-16">
         <div className="mx-auto max-w-4xl px-4">
           <span className="font-annotation inline-block -rotate-2 text-xs font-bold uppercase tracking-widest text-[#E8622E]">
             ★ THE GENVALUE DISPATCH
           </span>
-          <h1 className="font-display-custom mt-2 text-4xl font-extrabold tracking-tight text-[#2A2A28] dark:text-white sm:text-6xl">
+          <h1 className="font-display-custom mt-2 text-3xl font-extrabold tracking-tight text-[#2A2A28] dark:text-white sm:text-5xl md:text-6xl">
             AI Tooling & Workflow Journal
           </h1>
-          <p className="mx-auto mt-4 max-w-2xl text-base font-medium leading-relaxed text-[#6B6558] dark:text-slate-300 sm:text-lg">
+          <p className="mx-auto mt-4 max-w-2xl text-sm font-medium leading-relaxed text-[#6B6558] dark:text-slate-300 sm:text-base md:text-lg">
             Deep dives on AI tool selection, prompt engineering, and workflow automation written by practitioners at GenValue.
           </p>
         </div>
       </header>
 
       {/* Category Tabs Bar */}
-      <div className="sticky top-20 z-30 border-b border-black/10 bg-[#EDE6D3]/90 backdrop-blur-md dark:border-white/10 dark:bg-[#070B19]/90">
+      <div className="sticky top-16 z-30 border-b border-black/10 bg-[#EDE6D3]/90 backdrop-blur-md dark:border-white/10 dark:bg-[#070B19]/90 sm:top-20">
         <div className="mx-auto max-w-[1200px] px-4 py-3 sm:px-6">
           <div
-            className="flex items-center gap-2 overflow-x-auto no-scrollbar"
+            className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-0.5"
             role="toolbar"
             aria-label="Filter stories by category"
           >
@@ -222,7 +222,7 @@ export function BlogListing({ posts, initialTag }: Props) {
             ))}
           </div>
           {allTags.length > 0 ? (
-            <div className="mt-3 border-t border-black/5 pt-3 dark:border-white/10">
+            <div className="mt-3 max-h-28 overflow-y-auto border-t border-black/5 pt-3 dark:border-white/10 sm:max-h-none sm:overflow-visible">
               <p className="mb-2 text-[10px] font-bold uppercase tracking-wider text-[#6B6558] dark:text-slate-500">
                 Topics
               </p>

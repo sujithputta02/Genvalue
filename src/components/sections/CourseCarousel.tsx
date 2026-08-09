@@ -82,7 +82,7 @@ export function CourseCarousel() {
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: index * 0.05 }}
-              className="flex flex-[0_0_280px] xs:flex-[0_0_320px] sm:flex-[0_0_380px] snap-start flex-col justify-between rounded-[22px] border border-black/10 bg-[#F6F1E4] p-5 sm:p-7 shadow-xl transition-all duration-300 hover:scale-[1.02] dark:border-white/10 dark:bg-[#0D1B2A]"
+              className="flex w-[min(100%,300px)] flex-[0_0_min(100%,300px)] snap-start flex-col justify-between rounded-[22px] border border-black/10 bg-[#F6F1E4] p-5 shadow-xl transition-all duration-300 hover:scale-[1.02] dark:border-white/10 dark:bg-[#0D1B2A] sm:w-auto sm:flex-[0_0_360px] sm:p-7 md:flex-[0_0_380px]"
             >
               <div>
                 {/* Header Graphic */}

@@ -58,7 +58,7 @@ function InstructorCard({
 
   return (
     <article
-      className="rounded-[24px] border border-black/10 bg-[#F6F1E4] p-8 shadow-xl dark:border-white/10 dark:bg-[#0D1B2A] sm:p-12"
+      className="rounded-[24px] border border-black/10 bg-[#F6F1E4] p-5 shadow-xl dark:border-white/10 dark:bg-[#0D1B2A] sm:p-8 lg:p-12"
       aria-labelledby={headingId}
     >
       <div className="flex flex-col gap-10 lg:flex-row lg:items-start lg:gap-14">
@@ -83,13 +83,16 @@ function InstructorCard({
                   width={isLead ? 160 : 144}
                   height={isLead ? 160 : 144}
                   className="h-full w-full rounded-full object-cover"
+                  style={
+                    founder.photoPosition ? { objectPosition: founder.photoPosition } : undefined
+                  }
                   sizes={isLead ? "160px" : "144px"}
                   priority={isLead}
                   onError={onPhotoError}
                 />
               )}
             </div>
-            <span className="absolute -bottom-2 right-0 flex items-center gap-1 rounded-full bg-[#10B981] px-3 py-1 text-[11px] font-extrabold uppercase tracking-wider text-white shadow-md">
+            <span className="absolute -bottom-1 left-1/2 flex -translate-x-1/2 items-center gap-1 rounded-full bg-[#10B981] px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-wider text-white shadow-md sm:-bottom-2 sm:left-auto sm:right-0 sm:translate-x-0 sm:px-3 sm:text-[11px]">
               <FaCircleCheck className="h-3.5 w-3.5" aria-hidden="true" />
               Verified
             </span>
@@ -103,7 +106,7 @@ function InstructorCard({
           <h2
             id={headingId}
             className={`font-display-custom mt-1 font-extrabold tracking-tight text-[#2A2A28] dark:text-white ${
-              isLead ? "text-4xl sm:text-5xl" : "text-3xl sm:text-4xl"
+              isLead ? "text-2xl sm:text-4xl md:text-5xl" : "text-xl sm:text-3xl md:text-4xl"
             }`}
           >
             {founder.name}

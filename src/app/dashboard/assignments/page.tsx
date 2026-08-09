@@ -275,9 +275,9 @@ export default function StudentAssignmentsPage() {
         {/* Right 2 Cols: Submission Detail & Workspace */}
         <div className="lg:col-span-2">
           {selectedAssignment ? (
-            <div className="rounded-3xl border border-black/10 bg-[#F6F1E4] p-6 shadow-xl dark:border-white/10 dark:bg-[#0D1B2A] sm:p-8">
+            <div className="rounded-2xl border border-black/10 bg-[#F6F1E4] p-4 shadow-xl dark:border-white/10 dark:bg-[#0D1B2A] sm:rounded-3xl sm:p-8">
               <span className="font-annotation text-xs font-bold text-[#E8622E]">★ WEEK {selectedAssignment.week} DELIVERABLE</span>
-              <h2 className="font-display-custom mt-1 text-xl font-extrabold text-[#2A2A28] dark:text-white sm:text-2xl">
+              <h2 className="font-display-custom mt-1 text-lg font-extrabold text-[#2A2A28] dark:text-white sm:text-2xl">
                 {selectedAssignment.title}
               </h2>
               <p className="mt-2 text-xs font-medium leading-relaxed text-[#6B6558] dark:text-slate-300">
@@ -291,9 +291,9 @@ export default function StudentAssignmentsPage() {
                 </div>
               )}
 
-              <div className="mt-4 flex items-center gap-4 text-xs font-bold text-[#6B6558] dark:text-slate-400">
+              <div className="mt-4 flex flex-col gap-2 text-xs font-bold text-[#6B6558] dark:text-slate-400 sm:flex-row sm:items-center sm:gap-4">
                 <span className="flex items-center gap-1">
-                  <FaClock className="h-3.5 w-3.5 text-[#E8622E]" /> 
+                  <FaClock className="h-3.5 w-3.5 shrink-0 text-[#E8622E]" /> 
                   Deadline: {new Date(selectedAssignment.dueDate).toLocaleDateString()}
                 </span>
                 {selectedAssignment.type === "MCQ" && selectedAssignment.passingScore && (

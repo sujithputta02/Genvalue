@@ -5,6 +5,7 @@ import { verifyAdminSessionToken } from "../utils/adminSession.js";
 import {
   firebaseAdminCredentialsLoaded,
   probeFirebaseAdminAuth,
+  setFirebaseAuthUserDisabled,
 } from "../utils/firebaseAdminAuth.js";
 import {
   probeFirebasePublicKeyVerification,
@@ -205,6 +206,7 @@ export const verifyToken = async (req, res, next) => {
           role: true,
           name: true,
           firebaseUid: true,
+          deactivatedUntil: true,
         },
       });
 
@@ -233,6 +235,7 @@ export const verifyToken = async (req, res, next) => {
             role: true,
             name: true,
             firebaseUid: true,
+            deactivatedUntil: true,
           },
         });
       }
@@ -253,6 +256,27 @@ export const verifyToken = async (req, res, next) => {
         success: false,
         message: "Unauthorized: User not found in database",
       });
+    }
+
+    // Temporary admin deactivation — expire automatically, otherwise block LMS access
+    if (dbUser.deactivatedUntil) {
+      const untilMs = new Date(dbUser.deactivatedUntil).getTime();
+      if (untilMs > Date.now()) {
+        return res.status(403).json({
+          success: false,
+          message: `Account is temporarily deactivated until ${new Date(untilMs).toISOString()}. Contact GenValue support if you believe this is an error.`,
+          code: "ACCOUNT_DEACTIVATED",
+          deactivatedUntil: new Date(untilMs).toISOString(),
+        });
+      }
+
+      await prisma.user.update({
+        where: { id: dbUser.id },
+        data: { deactivatedUntil: null, deactivationReason: null },
+      }).catch(() => {});
+
+      setFirebaseAuthUserDisabled(adminAuth, dbUser.firebaseUid, false).catch(() => {});
+      dbUser.deactivatedUntil = null;
     }
 
     // Attach resolved user info to request object

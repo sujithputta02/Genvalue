@@ -1,0 +1,58 @@
+name: Bug report
+description: Report something that is broken or unexpected
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for helping improve GenValue. Please fill out the sections below.
+        Security issues: email genvalue.academy@gmail.com instead of filing here.
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: What happened, and what did you expect?
+      placeholder: Clear steps and the unexpected result…
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: Minimal steps someone else can follow
+      placeholder: |
+        1. Go to …
+        2. Click …
+        3. See error …
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Marketing site
+        - Student LMS
+        - Instructor portal
+        - Admin portal
+        - Backend / API
+        - Docs / DX
+        - Other
+    validations:
+      required: true
+  - type: input
+    id: env
+    attributes:
+      label: Environment
+      description: Browser, OS, and whether local / staging / production
+      placeholder: "Chrome 140 · macOS · https://genvalue-ten.vercel.app"
+    validations:
+      required: false
+  - type: textarea
+    id: extras
+    attributes:
+      label: Screenshots / logs
+      description: Paste relevant logs (redact secrets) or describe screenshots
+    validations:
+      required: false

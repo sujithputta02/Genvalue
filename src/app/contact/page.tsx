@@ -29,10 +29,10 @@ export default function ContactPage() {
           <span className="font-annotation inline-block -rotate-2 text-xs font-bold uppercase tracking-widest text-[#E8622E]">
             ★ ADMISSIONS & ENQUIRIES
           </span>
-          <h1 className="font-display-custom mt-2 text-balance text-4xl font-extrabold tracking-tight text-[#2A2A28] dark:text-white sm:text-5xl md:text-6xl">
+          <h1 className="font-display-custom mt-2 text-balance text-3xl font-extrabold tracking-tight text-[#2A2A28] dark:text-white sm:text-5xl md:text-6xl">
             Get in Touch
           </h1>
-          <p className="mx-auto mt-4 max-w-2xl text-pretty text-base font-medium leading-relaxed text-[#6B6558] sm:text-lg dark:text-slate-300">
+          <p className="mx-auto mt-4 max-w-2xl text-pretty text-sm font-medium leading-relaxed text-[#6B6558] sm:text-base md:text-lg dark:text-slate-300">
             Questions about the 12-week program, cohorts, or corporate team training - send a note and we&apos;ll reply within 24 hours.
           </p>
         </motion.div>
@@ -44,7 +44,7 @@ export default function ContactPage() {
           {/* Left Column - Contact Cards & Map (5 cols) */}
           <aside className="flex flex-col gap-8 lg:col-span-5">
             {/* Contact Details Card */}
-            <div className="rounded-3xl border border-black/10 bg-[#F6F1E4] p-6 shadow-xl dark:border-white/10 dark:bg-[#0D1B2A]">
+            <div className="rounded-3xl border border-black/10 bg-[#F6F1E4] p-5 shadow-xl dark:border-white/10 dark:bg-[#0D1B2A] sm:p-6">
               <span className="font-annotation text-xs font-bold uppercase tracking-widest text-[#E8622E]">
                 ★ ADMISSIONS & ENQUIRIES
               </span>
@@ -163,7 +163,7 @@ export default function ContactPage() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className="mt-16 rounded-3xl border border-black/10 bg-[#12266E] p-8 text-center text-white shadow-2xl lg:p-12"
+          className="mt-12 rounded-3xl border border-black/10 bg-[#12266E] p-5 text-center text-white shadow-2xl sm:mt-16 sm:p-8 lg:p-12"
         >
           <span className="font-annotation inline-block -rotate-2 text-xs font-bold uppercase tracking-widest text-[#E8622E]">
             ★ EXPLORE THE CURRICULUM FIRST
@@ -181,6 +181,7 @@ export default function ContactPage() {
               label="Download Syllabus PDF"
               variant="gold"
               size="md"
+              fullWidth
               trackingLabel="Download GenValue syllabus PDF from contact page"
             />
           </div>

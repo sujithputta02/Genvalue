@@ -132,7 +132,7 @@ export function Testimonials() {
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
-              className="flex flex-[0_0_340px] snap-start flex-col justify-between rounded-[22px] border border-black/10 bg-[#F6F1E4] p-8 shadow-xl transition-all duration-300 hover:scale-[1.02] dark:border-white/10 dark:bg-[#0D1B2A] sm:flex-[0_0_400px]"
+              className="flex w-[min(100%,320px)] flex-[0_0_min(100%,320px)] snap-start flex-col justify-between rounded-[22px] border border-black/10 bg-[#F6F1E4] p-5 shadow-xl transition-all duration-300 hover:scale-[1.02] dark:border-white/10 dark:bg-[#0D1B2A] sm:w-auto sm:flex-[0_0_380px] sm:p-8 md:flex-[0_0_400px]"
             >
               <blockquote className="flex flex-1 flex-col justify-between">
                 <p className="text-base italic leading-relaxed text-[#2A2A28] dark:text-slate-200 sm:text-lg">

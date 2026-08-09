@@ -17,7 +17,6 @@ const STATS: readonly string[] = [
   "1 Capstone Project",
 ] as const;
 
-// Torn Paper Edge SVG Path
 function TornPaperDivider({ className = "" }: { className?: string }) {
   return (
     <div className={`relative w-full overflow-hidden leading-none ${className}`} aria-hidden="true">
@@ -32,7 +31,6 @@ function TornPaperDivider({ className = "" }: { className?: string }) {
   );
 }
 
-// Staggered Container Animation
 const heroContainerVariants = {
   hidden: { opacity: 0 },
   visible: {
@@ -44,7 +42,6 @@ const heroContainerVariants = {
   },
 } as const;
 
-// Paper Rip Reveal Variants
 const paperTearReveal = {
   hidden: { clipPath: "polygon(0% 0%, 100% 0%, 100% 0%, 0% 0%)", opacity: 0, y: 40 },
   visible: {
@@ -88,22 +85,9 @@ const headlineVariants = {
 } as const;
 
 export function Hero() {
-  const [zoomScale, setZoomScale] = useState(1);
   const [isPlaying, setIsPlaying] = useState(true);
   const [isMuted, setIsMuted] = useState(true);
   const videoRef = useRef<HTMLVideoElement>(null);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      const progress = Math.min(Math.max(window.scrollY / 600, 0), 1);
-      setZoomScale(1 + progress * 0.2);
-    };
-
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
-  }, []);
 
   useEffect(() => {
     const video = videoRef.current;
@@ -134,41 +118,40 @@ export function Hero() {
   return (
     <section
       style={{ position: "relative" }}
-      className="relative mx-auto w-full max-w-[1300px] px-4 pt-24 pb-16 sm:px-6 sm:pt-32 lg:px-8 lg:pt-36"
+      className="relative mx-auto w-full max-w-[1300px] px-4 pt-20 pb-12 sm:px-6 sm:pt-28 sm:pb-16 lg:px-8 lg:pt-36 lg:pb-20"
       aria-labelledby="hero-heading"
     >
-      {/* Centered Editorial Layout with Animated Paper Tear Unfold */}
       <motion.div
         variants={heroContainerVariants}
         initial="hidden"
         animate="visible"
         className="relative mx-auto max-w-5xl text-center"
       >
-        {/* Top-Left Handwritten Annotation Badge with Hover Tilt */}
-        <motion.span
-          variants={badgeLeftVariants}
-          whileHover={{ scale: 1.12, rotate: -2 }}
-          className="font-annotation absolute -top-10 left-2 sm:-top-12 sm:left-12 text-sm font-bold tracking-wider text-[#6B6558] underline decoration-[#E8622E]/50 underline-offset-4 dark:text-slate-400 sm:text-base md:text-lg cursor-pointer"
-          aria-hidden="true"
-        >
-          PRACTITIONER-FIRST
-        </motion.span>
+        {/* Annotations: stacked on phones, corners from sm+ */}
+        <div className="mb-3 flex flex-wrap items-center justify-center gap-x-4 gap-y-1 sm:mb-0 sm:contents">
+          <motion.span
+            variants={badgeLeftVariants}
+            whileHover={{ scale: 1.12, rotate: -2 }}
+            className="font-annotation text-[11px] font-bold tracking-wider text-[#6B6558] underline decoration-[#E8622E]/50 underline-offset-4 dark:text-slate-400 min-[400px]:text-xs sm:absolute sm:-top-12 sm:left-6 sm:text-sm md:left-12 md:text-base lg:text-lg cursor-pointer"
+            aria-hidden="true"
+          >
+            PRACTITIONER-FIRST
+          </motion.span>
 
-        {/* Top-Right Handwritten Annotation Badge with Hover Tilt */}
-        <motion.span
-          variants={badgeRightVariants}
-          whileHover={{ scale: 1.12, rotate: 0 }}
-          className="font-annotation absolute -top-10 right-2 sm:-top-12 sm:right-12 text-sm font-bold tracking-wider text-[#1E3FE0] dark:text-[#60A5FA] sm:text-base md:text-lg cursor-pointer"
-          aria-hidden="true"
-        >
-          → NOT LECTURES
-        </motion.span>
+          <motion.span
+            variants={badgeRightVariants}
+            whileHover={{ scale: 1.12, rotate: 0 }}
+            className="font-annotation text-[11px] font-bold tracking-wider text-[#1E3FE0] dark:text-[#60A5FA] min-[400px]:text-xs sm:absolute sm:-top-12 sm:right-6 sm:text-sm md:right-12 md:text-base lg:text-lg cursor-pointer"
+            aria-hidden="true"
+          >
+            → NOT LECTURES
+          </motion.span>
+        </div>
 
-        {/* Giant Display Headline */}
         <motion.h1
           variants={headlineVariants}
           id="hero-heading"
-          className="font-display-custom mt-2 text-balance text-3xl font-extrabold leading-[1.05] tracking-tight text-[#2A2A28] dark:text-white xs:text-4xl sm:text-7xl md:text-8xl lg:text-[96px]"
+          className="font-display-custom mt-1 text-balance text-[1.75rem] font-extrabold leading-[1.08] tracking-tight text-[#2A2A28] dark:text-white min-[400px]:text-3xl sm:mt-2 sm:text-5xl md:text-7xl lg:text-[5.5rem] xl:text-[96px]"
         >
           Learning at the <br className="hidden sm:inline" />
           <span className="relative inline-block text-[#1E3FE0] dark:text-white">
@@ -178,20 +161,20 @@ export function Hero() {
 
         <motion.p
           variants={headlineVariants}
-          className="mx-auto mt-6 max-w-2xl text-pretty text-sm font-medium leading-relaxed text-[#6B6558] dark:text-slate-300 sm:text-lg md:text-xl"
+          className="mx-auto mt-4 max-w-2xl text-pretty px-1 text-sm font-medium leading-relaxed text-[#6B6558] dark:text-slate-300 sm:mt-6 sm:px-0 sm:text-lg md:text-xl"
         >
-          A practical 12-week program covering 40+ AI tools across 11 categories - engineered for working professionals who demand clear judgment over hype.
+          A practical 12-week program covering 40+ AI tools across 11 categories - engineered for
+          working professionals who demand clear judgment over hype.
         </motion.p>
 
-        {/* Action Buttons with Spring Feedback */}
         <motion.div
           variants={headlineVariants}
-          className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row sm:gap-4"
+          className="mt-6 flex w-full flex-col items-stretch justify-center gap-3 sm:mt-8 sm:flex-row sm:items-center sm:gap-4"
         >
           <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="w-full sm:w-auto">
             <EnrollNowLink
               aria-label="Enroll in AI Tools Mastery program"
-              className="inline-flex min-h-12 w-full items-center justify-center rounded-full bg-[#E8622E] px-8 text-base font-bold uppercase tracking-wider text-white shadow-xl transition hover:bg-[#d55321] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#E8622E] sm:w-auto sm:px-10"
+              className="inline-flex min-h-12 w-full items-center justify-center whitespace-nowrap rounded-full bg-[#E8622E] px-6 text-sm font-bold uppercase tracking-wider text-white shadow-xl transition hover:bg-[#d55321] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#E8622E] sm:px-10 sm:text-base"
             >
               Enroll Now
             </EnrollNowLink>
@@ -201,14 +184,14 @@ export function Hero() {
             <Link
               href="/syllabus"
               aria-label="View the 12-week course syllabus"
-              className="inline-flex min-h-12 w-full items-center justify-center rounded-full border-2 border-[#2A2A28] bg-transparent px-8 text-base font-bold text-[#2A2A28] transition hover:bg-[#2A2A28]/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2A2A28] dark:border-white dark:text-white dark:hover:bg-white/10 sm:w-auto"
+              className="inline-flex min-h-12 w-full items-center justify-center whitespace-nowrap rounded-full border-2 border-[#2A2A28] bg-transparent px-6 text-sm font-bold text-[#2A2A28] transition hover:bg-[#2A2A28]/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2A2A28] dark:border-white dark:text-white dark:hover:bg-white/10 sm:px-8 sm:text-base"
             >
               View Syllabus
             </Link>
           </motion.div>
         </motion.div>
 
-        <motion.div variants={headlineVariants} className="mt-4 flex items-center justify-center">
+        <motion.div variants={headlineVariants} className="mt-3 flex items-center justify-center sm:mt-4">
           <DownloadButton
             href={SITE.syllabusPdfUrl}
             filename={SITE.syllabusDownloadFilename}
@@ -220,42 +203,41 @@ export function Hero() {
         </motion.div>
       </motion.div>
 
-      {/* Animated Torn Paper Tear Line */}
       <motion.div
         initial={{ scaleX: 0, opacity: 0 }}
         animate={{ scaleX: 1, opacity: 1 }}
         transition={{ duration: 0.8, delay: 0.4, ease: "easeOut" }}
-        className="mt-12 w-full origin-center"
+        className="mt-8 w-full origin-center sm:mt-12"
       >
         <TornPaperDivider />
       </motion.div>
 
-      {/* Screen Frame Mockup Container with Paper Tear Unfold */}
       <motion.div
         variants={paperTearReveal}
         initial="hidden"
         animate="visible"
-        className="relative overflow-hidden rounded-3xl border border-black/15 bg-[#0D1B2A] shadow-[0_30px_70px_-15px_rgba(0,0,0,0.35)] ring-1 ring-black/10 dark:border-white/15 dark:shadow-[0_30px_70px_-15px_rgba(0,0,0,0.7)]"
+        className="relative overflow-hidden rounded-2xl border border-black/15 bg-[#0D1B2A] shadow-[0_30px_70px_-15px_rgba(0,0,0,0.35)] ring-1 ring-black/10 dark:border-white/15 dark:shadow-[0_30px_70px_-15px_rgba(0,0,0,0.7)] sm:rounded-3xl"
       >
-        {/* Screen / Browser Window Header Bar */}
-        <div className="flex items-center justify-between border-b border-white/10 bg-[#12266E] px-5 py-3.5 backdrop-blur-md">
-          <div className="flex items-center gap-2">
-            <span className="h-3 w-3 rounded-full bg-[#EF4444] shadow-sm" />
-            <span className="h-3 w-3 rounded-full bg-[#F59E0B] shadow-sm" />
-            <span className="h-3 w-3 rounded-full bg-[#10B981] shadow-sm" />
-          </div>
-          <div className="flex items-center gap-2 rounded-full border border-white/10 bg-white/10 px-5 py-1 text-xs font-bold text-white/80">
-            <span className="h-2 w-2 rounded-full bg-[#10B981] animate-pulse" />
-            <span>genvalue.academy / ai-tools-mastery</span>
+        {/* Browser chrome — wraps cleanly on small screens */}
+        <div className="flex flex-wrap items-center gap-2 border-b border-white/10 bg-[#12266E] px-3 py-2.5 backdrop-blur-md sm:gap-3 sm:px-5 sm:py-3.5">
+          <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
+            <span className="h-2.5 w-2.5 rounded-full bg-[#EF4444] shadow-sm sm:h-3 sm:w-3" />
+            <span className="h-2.5 w-2.5 rounded-full bg-[#F59E0B] shadow-sm sm:h-3 sm:w-3" />
+            <span className="h-2.5 w-2.5 rounded-full bg-[#10B981] shadow-sm sm:h-3 sm:w-3" />
           </div>
 
-          {/* Interactive Video Play/Pause + Mute/Unmute */}
-          <div className="flex items-center gap-2">
+          <div className="order-last flex min-w-0 flex-[1_1_100%] items-center gap-2 truncate rounded-full border border-white/10 bg-white/10 px-3 py-1 text-[10px] font-bold text-white/80 sm:order-none sm:flex-[1_1_auto] sm:justify-center sm:px-5 sm:text-xs md:max-w-md md:mx-auto">
+            <span className="h-2 w-2 shrink-0 rounded-full bg-[#10B981] animate-pulse" />
+            <span className="truncate sm:hidden">genvalue.academy</span>
+            <span className="hidden truncate sm:inline">genvalue.academy / ai-tools-mastery</span>
+          </div>
+
+          <div className="ml-auto flex shrink-0 items-center gap-1.5 sm:gap-2">
             <button
               type="button"
               onClick={toggleVideo}
               aria-label={isPlaying ? "Pause promo video" : "Play promo video"}
-              className="flex items-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-bold text-white transition hover:bg-white/20"
+              className="flex items-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-2.5 py-1 text-xs font-bold text-white transition hover:bg-white/20 sm:px-3"
             >
               {isPlaying ? (
                 <>
@@ -274,7 +256,7 @@ export function Hero() {
               onClick={toggleMute}
               aria-label={isMuted ? "Unmute promo video" : "Mute promo video"}
               aria-pressed={!isMuted}
-              className="flex items-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-bold text-white transition hover:bg-white/20"
+              className="flex items-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-2.5 py-1 text-xs font-bold text-white transition hover:bg-white/20 sm:px-3"
             >
               {isMuted ? (
                 <>
@@ -291,13 +273,8 @@ export function Hero() {
           </div>
         </div>
 
-        {/* Video Display Area */}
         <div className="relative aspect-[16/9] w-full overflow-hidden bg-[#070B19]">
-          <motion.div
-            style={{ scale: zoomScale }}
-            transition={{ ease: "linear" }}
-            className="relative h-full w-full"
-          >
+          <div className="relative h-full w-full">
             <video
               ref={videoRef}
               src={HERO_VIDEO_SRC}
@@ -309,26 +286,23 @@ export function Hero() {
               controls={false}
               className="h-full w-full object-cover"
             />
-          </motion.div>
+          </div>
 
-          {/* Floating Caption Badge */}
-          <div className="absolute bottom-5 right-6 rounded-full bg-black/65 px-5 py-2 font-annotation text-xs font-bold text-white backdrop-blur-md sm:text-sm">
+          <div className="absolute bottom-3 left-3 right-3 rounded-full bg-black/65 px-3 py-1.5 text-center font-annotation text-[10px] font-bold text-white backdrop-blur-md sm:bottom-5 sm:left-auto sm:right-6 sm:max-w-none sm:px-5 sm:py-2 sm:text-left sm:text-xs md:text-sm">
             GenValue thinks with you, not at you.
           </div>
         </div>
       </motion.div>
 
-      {/* Quick Stat Bar */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.7, duration: 0.6 }}
-        className="mt-10 border-t border-black/10 pt-6 dark:border-white/10"
+        className="mt-8 border-t border-black/10 pt-5 dark:border-white/10 sm:mt-10 sm:pt-6"
       >
-        <ul className="flex flex-wrap items-center justify-center gap-4 text-xs font-bold uppercase tracking-wider text-[#6B6558] dark:text-slate-400 sm:gap-8 sm:text-sm">
-          {STATS.map((label, index) => (
-            <li key={label} className="flex items-center gap-4 sm:gap-8">
-              {index > 0 && <span className="opacity-25">|</span>}
+        <ul className="grid grid-cols-2 gap-3 text-center text-[10px] font-bold uppercase tracking-wider text-[#6B6558] dark:text-slate-400 min-[480px]:gap-4 sm:flex sm:flex-wrap sm:items-center sm:justify-center sm:gap-6 sm:text-xs md:gap-8 md:text-sm">
+          {STATS.map((label) => (
+            <li key={label} className="min-w-0">
               <span className="text-[#2A2A28] dark:text-white">{label}</span>
             </li>
           ))}

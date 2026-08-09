@@ -455,12 +455,21 @@ export const verifyAdminOTP = async (
 ): Promise<AuthResponse> => {
   try {
     const normalizedOtp = otp.replace(/\D/g, "").slice(-6);
+    const timeZone =
+      typeof Intl !== "undefined"
+        ? Intl.DateTimeFormat().resolvedOptions().timeZone
+        : undefined;
+
     const response = await fetch(`${API_URL}/auth/admin/verify-otp`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ email: email.trim().toLowerCase(), otp: normalizedOtp }),
+      body: JSON.stringify({
+        email: email.trim().toLowerCase(),
+        otp: normalizedOtp,
+        ...(timeZone ? { timeZone } : {}),
+      }),
     });
 
     const data: AuthResponse = await response.json();

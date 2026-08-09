@@ -80,33 +80,3 @@ export function buildAdminOtpEmailText({ otp, email, expiresMinutes = 10 }) {
     "— GenValue Academy",
   ].join("\n");
 }
-
-export function buildAdminInviteEmailHtml({ email, addedByEmail }) {
-  const safeEmail = escapeHtml(email);
-  const safeAddedBy = escapeHtml(addedByEmail);
-
-  return `<!DOCTYPE html>
-<html lang="en">
-<head><meta charset="utf-8" /><title>GenValue Admin Access Granted</title></head>
-<body style="margin:0;padding:0;background-color:#EDE6D3;font-family:system-ui,sans-serif;">
-  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color:#EDE6D3;padding:32px 16px;">
-    <tr><td align="center">
-      <table role="presentation" width="100%" style="max-width:520px;background-color:#F6F1E4;border-radius:24px;border:1px solid rgba(0,0,0,0.1);">
-        <tr><td style="background-color:#0D1B2A;padding:24px 32px;text-align:center;">
-          <h1 style="margin:0;font-size:22px;font-weight:800;color:#fff;"><span>Gen</span><span style="color:#60A5FA;">Value</span> Admin</h1>
-        </td></tr>
-        <tr><td style="padding:32px;">
-          <p style="margin:0 0 16px;font-size:15px;color:#2A2A28;">Hello,</p>
-          <p style="margin:0 0 16px;font-size:15px;line-height:1.6;color:#6B6558;">
-            <strong style="color:#2A2A28;">${safeEmail}</strong> has been authorized to access the GenValue Academy admin portal
-            by <strong style="color:#2A2A28;">${safeAddedBy}</strong>.
-          </p>
-          <p style="margin:0;font-size:15px;line-height:1.6;color:#6B6558;">
-            Sign in at the admin portal with your email to receive a one-time passcode.
-          </p>
-        </td></tr>
-      </table>
-    </td></tr>
-  </table>
-</body></html>`;
-}

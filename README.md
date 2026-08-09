@@ -1,6 +1,6 @@
-# GenValue Academy
+# GenValue
 
-Practical AI education platform for **GenValue Academy** — marketing site, student LMS, and admin portal in one codebase.
+Practical AI education platform for **GenValue** — marketing site, student LMS, and admin portal in one codebase.
 
 > **Choosing the Right AI Tool for Every Task**
 
@@ -132,7 +132,7 @@ Copy [`.env.example`](./.env.example) → `.env.local` (frontend) and `backend/.
 | `FIREBASE_SERVICE_ACCOUNT` | Firebase Admin JSON (or path per your setup) |
 | `CLOUDINARY_*` | Cloud upload credentials (see `SETUP_GUIDE.md` / backend config) |
 
-Contact form email uses **Brevo SMTP** (`BREVO_SMTP_USER` + `BREVO_SMTP_KEY`) so local sends work without REST API IP whitelisting. Team inbox defaults to `BREVO_TEAM_EMAIL` or the GenValue academy address.
+Contact form email uses **Brevo SMTP** (`BREVO_SMTP_USER` + `BREVO_SMTP_KEY`) so local sends work without REST API IP whitelisting. Team inbox defaults to `BREVO_TEAM_EMAIL` or the GenValue address.
 
 ---
 
@@ -268,7 +268,7 @@ See [`SECURITY.md`](./SECURITY.md) for the full checklist.
 
 ## Brand
 
-- **Academy:** GenValue Academy  
+- **Academy:** GenValue  
 - **Contact:** genvalue.academy@gmail.com  
 - **Tagline:** Choosing the Right AI Tool for Every Task  
 

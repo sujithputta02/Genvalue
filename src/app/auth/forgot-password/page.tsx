@@ -39,7 +39,7 @@ function PasswordVisibilityToggle({
     <button
       type="button"
       onClick={onToggle}
-      className="absolute right-4 top-3 text-[#6B6558] hover:text-[#2A2A28] dark:text-slate-400 dark:hover:text-white transition-colors"
+      className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-[#6B6558] transition-colors hover:text-[#2A2A28] dark:text-slate-400 dark:hover:text-white sm:right-4"
       aria-label={visible ? "Hide password" : "Show password"}
     >
       {visible ? (
@@ -197,7 +197,7 @@ export default function ForgotPasswordPage() {
   const passwordsMatch = password === confirmPassword && confirmPassword !== "";
 
   return (
-    <div className="relative flex min-h-screen items-center justify-center bg-[#EDE6D3] px-4 py-16 text-[#2A2A28] dark:bg-[#070B19] dark:text-white">
+    <div className="relative flex min-h-dvh items-center justify-center overflow-x-hidden bg-[#EDE6D3] px-3 py-8 text-[#2A2A28] dark:bg-[#070B19] dark:text-white sm:px-4 sm:py-12 md:py-16">
       <div
         className="pointer-events-none absolute inset-0 opacity-[0.05] [background-image:linear-gradient(#000_1px,transparent_1px),linear-gradient(90deg,#000_1px,transparent_1px)] [background-size:24px_24px] dark:opacity-[0.07] dark:[background-image:linear-gradient(#fff_1px,transparent_1px),linear-gradient(90deg,#fff_1px,transparent_1px)]"
         aria-hidden="true"
@@ -207,20 +207,20 @@ export default function ForgotPasswordPage() {
         initial={{ opacity: 0, y: 24 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
-        className="relative z-10 w-full max-w-md rounded-3xl border border-black/10 bg-[#F6F1E4] p-8 shadow-2xl dark:border-white/10 dark:bg-[#0D1B2A] sm:p-10"
+        className="relative z-10 w-full max-w-md rounded-2xl border border-black/10 bg-[#F6F1E4] p-5 shadow-2xl dark:border-white/10 dark:bg-[#0D1B2A] sm:rounded-3xl sm:p-8 md:p-10"
       >
         <div className="text-center">
-          <Link href="/" className="inline-flex items-center gap-2">
-            <div className="relative h-10 w-10">
+          <Link href="/" className="inline-flex items-center gap-2" aria-label="GenValue home">
+            <div className="relative h-9 w-9 sm:h-10 sm:w-10">
               <Image src="/Genvalue Light.svg" alt="GenValue Logo" fill className="object-contain dark:hidden" priority />
               <Image src="/Genvalue Dark.svg" alt="GenValue Logo" fill className="hidden object-contain dark:block" priority />
             </div>
-            <span className="font-display-custom text-2xl font-extrabold tracking-tight">
+            <span className="font-display-custom text-xl font-extrabold tracking-tight sm:text-2xl">
               <span className="text-[#2A2A28] dark:text-white">Gen</span>
               <span className="text-[#1E3FE0] dark:text-[#60A5FA]">Value</span>
             </span>
           </Link>
-          <h1 className="font-display-custom mt-4 text-2xl font-extrabold tracking-tight sm:text-3xl">
+          <h1 className="font-display-custom mt-3 text-xl font-extrabold tracking-tight sm:mt-4 sm:text-3xl">
             Reset Password
           </h1>
           <p className="mt-1 text-xs font-medium text-[#6B6558] dark:text-slate-400">
@@ -258,7 +258,7 @@ export default function ForgotPasswordPage() {
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="student@gmail.com"
                   autoComplete="email"
-                  className="w-full rounded-2xl border border-black/10 bg-white pl-11 pr-4 py-3 text-sm font-medium outline-none transition focus:border-[#1E3FE0] dark:border-white/10 dark:bg-white/5 dark:focus:border-[#60A5FA]"
+                  className="w-full rounded-2xl border border-black/10 bg-white py-3 pl-11 pr-4 text-base font-medium outline-none transition focus:border-[#1E3FE0] dark:border-white/10 dark:bg-white/5 dark:focus:border-[#60A5FA] sm:text-sm"
                 />
               </div>
             </div>
@@ -266,7 +266,7 @@ export default function ForgotPasswordPage() {
             <button
               type="submit"
               disabled={loading}
-              className="flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-[#E8622E] px-6 text-sm font-bold uppercase tracking-wider text-white shadow-xl transition hover:bg-[#d55321] disabled:opacity-50"
+              className="flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-[#E8622E] px-5 text-xs font-bold uppercase tracking-wider text-white shadow-xl transition hover:bg-[#d55321] disabled:opacity-50 sm:px-6 sm:text-sm"
               aria-label="Send password reset code"
             >
               {loading ? "Sending…" : "Send Reset Code"}
@@ -297,7 +297,7 @@ export default function ForgotPasswordPage() {
                   onChange={(e) => setOtp(normalizeOtp(e.target.value))}
                   placeholder="123456"
                   autoComplete="one-time-code"
-                  className="w-full rounded-2xl border border-black/10 bg-white pl-11 pr-4 py-3 text-sm font-medium tracking-[0.3em] outline-none transition focus:border-[#1E3FE0] dark:border-white/10 dark:bg-white/5 dark:focus:border-[#60A5FA]"
+                  className="w-full rounded-2xl border border-black/10 bg-white py-3 pl-11 pr-4 text-base font-medium tracking-[0.3em] outline-none transition focus:border-[#1E3FE0] dark:border-white/10 dark:bg-white/5 dark:focus:border-[#60A5FA] sm:text-sm"
                   aria-label="6-digit verification code"
                 />
               </div>
@@ -306,7 +306,7 @@ export default function ForgotPasswordPage() {
             <button
               type="submit"
               disabled={loading || otp.length !== 6}
-              className="flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-[#E8622E] px-6 text-sm font-bold uppercase tracking-wider text-white shadow-xl transition hover:bg-[#d55321] disabled:opacity-50"
+              className="flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-[#E8622E] px-5 text-xs font-bold uppercase tracking-wider text-white shadow-xl transition hover:bg-[#d55321] disabled:opacity-50 sm:px-6 sm:text-sm"
               aria-label="Verify reset code"
             >
               {loading ? "Verifying…" : "Verify Code"}
@@ -342,7 +342,7 @@ export default function ForgotPasswordPage() {
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Enter new password"
                   autoComplete="new-password"
-                  className="w-full rounded-2xl border border-black/10 bg-white pl-11 pr-12 py-3 text-sm font-medium outline-none transition focus:border-[#1E3FE0] dark:border-white/10 dark:bg-white/5 dark:focus:border-[#60A5FA]"
+                  className="w-full rounded-2xl border border-black/10 bg-white py-3 pl-11 pr-12 text-base font-medium outline-none transition focus:border-[#1E3FE0] dark:border-white/10 dark:bg-white/5 dark:focus:border-[#60A5FA] sm:text-sm"
                 />
                 <PasswordVisibilityToggle visible={showPassword} onToggle={() => setShowPassword(!showPassword)} />
               </div>
@@ -363,7 +363,7 @@ export default function ForgotPasswordPage() {
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   placeholder="Re-enter new password"
                   autoComplete="new-password"
-                  className="w-full rounded-2xl border border-black/10 bg-white pl-11 pr-12 py-3 text-sm font-medium outline-none transition focus:border-[#1E3FE0] dark:border-white/10 dark:bg-white/5 dark:focus:border-[#60A5FA]"
+                  className="w-full rounded-2xl border border-black/10 bg-white py-3 pl-11 pr-12 text-base font-medium outline-none transition focus:border-[#1E3FE0] dark:border-white/10 dark:bg-white/5 dark:focus:border-[#60A5FA] sm:text-sm"
                 />
                 <PasswordVisibilityToggle
                   visible={showConfirmPassword}
@@ -378,7 +378,7 @@ export default function ForgotPasswordPage() {
             <button
               type="submit"
               disabled={loading || !passwordsMatch || password.length < 6}
-              className="flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-[#E8622E] px-6 text-sm font-bold uppercase tracking-wider text-white shadow-xl transition hover:bg-[#d55321] disabled:opacity-50"
+              className="flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-[#E8622E] px-5 text-xs font-bold uppercase tracking-wider text-white shadow-xl transition hover:bg-[#d55321] disabled:opacity-50 sm:px-6 sm:text-sm"
               aria-label="Update password"
             >
               {loading ? "Updating…" : "Update Password"}

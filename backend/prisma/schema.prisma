@@ -56,6 +56,10 @@ model User {
   
   // Account Information
   membershipPlan    String?   @default("FREE")
+
+  // Temporary deactivation (admin). Null / past date = active.
+  deactivatedUntil    DateTime?
+  deactivationReason  String?   @db.String
   
   // Timestamps
   createdAt         DateTime  @default(now())
@@ -176,6 +180,10 @@ model AuthorizedAdmin {
   roles          String[] @default([])
   portalSections String[] @default([])
   userLimit      Int?
+  /** IANA timezone from last successful admin login (e.g. America/New_York) */
+  timezone       String?
+  lastLoginAt    DateTime?
+  lastLogoutAt   DateTime?
   addedByEmail String?
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
@@ -193,6 +201,22 @@ model AdminPortalSettings {
   updatedByEmail      String?
 
   @@map("admin_portal_settings")
+}
+
+// Org title roles for the admin portal (CREATED in UI; portal section keys stay closed-set in code)
+model AdminOrgRole {
+  id             String   @id @default(uuid())
+  key            String   @unique
+  label          String
+  portalSections String[] @default([])
+  isActive       Boolean  @default(true)
+  isSystem       Boolean  @default(false)
+  sortOrder      Int      @default(0)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([isActive])
+  @@map("admin_org_roles")
 }
 
 // Announcement model - for admin-created announcements

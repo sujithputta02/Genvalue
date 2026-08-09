@@ -4,7 +4,7 @@ import {
   listAdminUsers,
   getAdminAuditLogs,
 } from "../controllers/adminAnalyticsController.js";
-import { removeStudent } from "../controllers/adminUserController.js";
+import { removeStudent, deactivateStudent, reactivateStudent } from "../controllers/adminUserController.js";
 import { getPortalSecurityReport } from "../controllers/securityController.js";
 import {
   listBugReports,
@@ -28,6 +28,18 @@ router.get(
   requireAdminSession,
   requireAdminPortalRole("STUDENTS"),
   listAdminUsers
+);
+router.post(
+  "/users/:userId/deactivate",
+  requireAdminSession,
+  requireAdminPortalRole("STUDENTS"),
+  deactivateStudent
+);
+router.post(
+  "/users/:userId/reactivate",
+  requireAdminSession,
+  requireAdminPortalRole("STUDENTS"),
+  reactivateStudent
 );
 router.post(
   "/users/:userId/remove",

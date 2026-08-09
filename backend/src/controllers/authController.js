@@ -6,7 +6,7 @@ import {
 } from "firebase/auth";
 import { auth, adminAuth } from "../config/firebase.js";
 import { prisma } from "../config/database.js";
-import { resolveLmsSignupRole, LMS_STUDENT_ROLE } from "../constants/lmsRoles.js";
+import { resolveLmsSignupRole, LMS_STUDENT_ROLE, isLmsStudentRole } from "../constants/lmsRoles.js";
 import { sendBrevoEmail } from "../services/brevoService.js";
 import {
   buildAdminOtpEmailHtml,
@@ -18,9 +18,45 @@ import {
   sanitizeText,
   validatePassword,
 } from "../utils/inputValidation.js";
+import { getFirebaseAuthUserStatus } from "../utils/firebaseAdminAuth.js";
+import { insertUserRemovalLog } from "../utils/ensureUserRemovalLogSchema.js";
 import { validateBase64Image } from "../utils/secureImageUpload.js";
 
 const OTP_EXPIRY_MINUTES = 10;
+
+/**
+ * Remove an LMS student row whose Firebase Auth user is already gone,
+ * so the email can register again.
+ */
+async function purgeOrphanStudentByEmail(existingUser, reason) {
+  if (!existingUser || !isLmsStudentRole(existingUser.role)) {
+    return false;
+  }
+
+  await prisma.session.deleteMany({ where: { userId: existingUser.id } });
+
+  try {
+    await insertUserRemovalLog({
+      userId: existingUser.id,
+      email: existingUser.email,
+      name: existingUser.name,
+      reason,
+      removedById: null,
+      removedByEmail: "system:firebase-orphan-reclaim",
+    });
+  } catch (logError) {
+    console.warn(
+      "[auth] orphan purge audit log skipped:",
+      logError?.message ?? logError
+    );
+  }
+
+  await prisma.user.delete({ where: { id: existingUser.id } });
+  console.info(
+    `[auth] Purged orphan LMS student ${existingUser.email} (${existingUser.id}): ${reason}`
+  );
+  return true;
+}
 
 async function saveAdminOtp(email, otp, expiresAt) {
   const existing = await prisma.adminOTP.findFirst({
@@ -78,9 +114,83 @@ export const registerUser = async (req, res) => {
     }
 
     // Check if user already exists in CockroachDB
-    const existingUser = await prisma.user.findUnique({
+    let existingUser = await prisma.user.findUnique({
       where: { email: email.toLowerCase() },
     });
+
+    if (existingUser) {
+      const firebaseStatus = await getFirebaseAuthUserStatus(
+        adminAuth,
+        existingUser.firebaseUid
+      );
+
+      // Firebase Auth user was deleted (e.g. console) — clear LMS orphan so email can re-register
+      if (firebaseStatus === "missing" && isLmsStudentRole(existingUser.role)) {
+        await purgeOrphanStudentByEmail(
+          existingUser,
+          "Auto-removed orphan LMS account after Firebase Authentication user was deleted; email reclaimed for signup."
+        );
+        existingUser = null;
+      } else if (firebaseStatus === "unavailable" && isLmsStudentRole(existingUser.role)) {
+        // Cannot probe Firebase Admin; try creating the Auth user.
+        // If email is free in Firebase, Auth was already deleted — purge LMS orphan and continue.
+        try {
+          const probeCredential = await createUserWithEmailAndPassword(
+            auth,
+            email,
+            password
+          );
+          await purgeOrphanStudentByEmail(
+            existingUser,
+            "Auto-removed orphan LMS account after Firebase Authentication user was deleted; email reclaimed for signup."
+          );
+          existingUser = null;
+
+          // Auth user already created above — finish LMS provisioning and return
+          const firebaseUser = probeCredential.user;
+          const dbUser = await prisma.user.create({
+            data: {
+              email: email.toLowerCase(),
+              name: name,
+              role: role,
+              firebaseUid: firebaseUser.uid,
+              emailVerified: firebaseUser.emailVerified,
+              authProvider: "EMAIL",
+              linkedProviders: ["EMAIL"],
+              lastLoginAt: new Date(),
+            },
+          });
+
+          const idToken = await firebaseUser.getIdToken();
+          await prisma.session.create({
+            data: {
+              userId: dbUser.id,
+              firebaseToken: idToken,
+              expiresAt: new Date(Date.now() + 3600 * 1000),
+            },
+          });
+
+          return res.status(201).json({
+            success: true,
+            message: "User registered successfully",
+            data: {
+              uid: dbUser.id,
+              firebaseUid: dbUser.firebaseUid,
+              email: dbUser.email,
+              name: dbUser.name,
+              role: dbUser.role,
+              authProvider: dbUser.authProvider,
+              idToken: idToken,
+            },
+          });
+        } catch (probeError) {
+          if (probeError?.code !== "auth/email-already-in-use") {
+            throw probeError;
+          }
+          // Firebase still has this email — fall through to linking / already-registered
+        }
+      }
+    }
 
     if (existingUser) {
       // If user exists with Google OAuth, link the email/password method
@@ -128,12 +238,12 @@ export const registerUser = async (req, res) => {
             idToken: idToken,
           },
         });
-      } else {
-        return res.status(400).json({
-          success: false,
-          message: "Email already registered",
-        });
       }
+
+      return res.status(400).json({
+        success: false,
+        message: "Email already registered",
+      });
     }
 
     // Create user in Firebase Auth
@@ -366,9 +476,9 @@ export const handleGoogleAuth = async (req, res) => {
     });
 
     if (dbUser) {
-      // User exists - link Google OAuth if not already linked
+      // User exists — sync Firebase UID (needed after Auth console delete + Google re-signup)
+      // and link Google when the LMS account was email-only.
       if (dbUser.authProvider === "EMAIL") {
-        // Link Google OAuth to existing email/password account
         dbUser = await prisma.user.update({
           where: { id: dbUser.id },
           data: {
@@ -381,12 +491,13 @@ export const handleGoogleAuth = async (req, res) => {
           },
         });
       } else {
-        // Just update last login
         dbUser = await prisma.user.update({
           where: { id: dbUser.id },
           data: {
+            firebaseUid: firebaseUid,
+            googleId: decodedToken.sub || firebaseUid,
             lastLoginAt: new Date(),
-            googlePhotoUrl: picture, // Update photo if changed
+            googlePhotoUrl: picture,
           },
         });
       }

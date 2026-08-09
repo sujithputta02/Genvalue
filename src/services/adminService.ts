@@ -17,10 +17,10 @@ import {
   isAdminTokenValue,
   LMS_AUTH_TOKEN_KEY,
 } from "@/lib/authTokens";
-import type { PortalSectionKey } from "@/lib/adminRoles";
+import type { AdminOrgRoleDefinition, PortalSectionKey } from "@/lib/adminRoles";
 const ADMIN_PROFILE_CACHE_KEY = "adminProfileCache";
 
-export type AdminOrgRoleKey = "FOUNDER" | "COFOUNDER" | "CTO" | "CPO" | "INSTRUCTOR";
+export type AdminOrgRoleKey = string;
 
 export interface AdminProfile {
   userId: string;
@@ -30,11 +30,13 @@ export interface AdminProfile {
   isSuperAdmin: boolean;
   roles: AdminOrgRoleKey[];
   portalSections?: PortalSectionKey[];
+  effectivePortalSections?: PortalSectionKey[];
   userLimit: number | null;
 }
 
 interface AdminSessionPayload extends AdminProfile {
   exp: number;
+  effectivePortalSections?: PortalSectionKey[];
 }
 
 function decodeBase64Url(value: string): string {
@@ -87,6 +89,7 @@ export function profileFromAdminToken(token?: string | null): AdminProfile | nul
     isSuperAdmin: payload.isSuperAdmin,
     roles: payload.roles ?? [],
     portalSections: payload.portalSections ?? [],
+    effectivePortalSections: payload.effectivePortalSections ?? [],
     userLimit: payload.userLimit,
   };
 }
@@ -130,6 +133,9 @@ export interface AuthorizedAdmin {
   userLimit: number | null;
   addedByEmail: string | null;
   createdAt: string;
+  timezone?: string | null;
+  lastLoginAt?: string | null;
+  lastLogoutAt?: string | null;
 }
 
 export interface AdminAuditLog {
@@ -173,7 +179,13 @@ export interface AdminUser {
   emailVerified: boolean;
   createdAt: string;
   lastLoginAt: string | null;
+  deactivatedUntil?: string | null;
+  deactivationReason?: string | null;
+  isDeactivated?: boolean;
 }
+
+export const DEACTIVATION_DAY_OPTIONS = [7, 14, 30, 90] as const;
+export type DeactivationDays = (typeof DEACTIVATION_DAY_OPTIONS)[number];
 
 export interface AdminUsersStats {
   totalStudents: number;
@@ -297,7 +309,7 @@ export async function addAuthorizedAdmin(
     isSuperAdmin?: boolean;
     portalSections?: PortalSectionKey[];
   }
-): Promise<void> {
+): Promise<{ emailSent: boolean; message: string }> {
   const response = await fetch(`${API_URL}/auth/admin/authorized-emails`, {
     method: "POST",
     headers: getAdminAuthHeaders(),
@@ -315,6 +327,11 @@ export async function addAuthorizedAdmin(
   if (!response.ok) {
     throw new Error(data.message || "Failed to add admin email");
   }
+
+  return {
+    emailSent: Boolean(data.emailSent),
+    message: typeof data.message === "string" ? data.message : "Admin email authorized",
+  };
 }
 
 export async function updateAuthorizedAdmin(
@@ -361,6 +378,79 @@ export async function removeAuthorizedAdmin(email: string): Promise<void> {
   if (!response.ok) {
     throw new Error(data.message || "Failed to revoke admin access");
   }
+}
+
+/** Best-effort: record logout time before clearing the local admin session. */
+export async function recordAdminLogout(): Promise<void> {
+  if (!isValidAdminToken()) return;
+  try {
+    await fetch(`${API_URL}/auth/admin/logout`, {
+      method: "POST",
+      headers: getAdminAuthHeaders(),
+      keepalive: true,
+    });
+  } catch {
+    // Session clear should still proceed even if logging fails.
+  }
+}
+
+export async function listAdminOrgRoles(includeInactive = false): Promise<{
+  roles: AdminOrgRoleDefinition[];
+  portalSections: PortalSectionKey[];
+}> {
+  const query = includeInactive ? "?includeInactive=true" : "";
+  const response = await fetch(`${API_URL}/auth/admin/org-roles${query}`, {
+    headers: getAdminAuthHeaders(),
+  });
+  const data = await response.json();
+  if (!response.ok) {
+    throw new Error(data.message || "Failed to load org roles");
+  }
+  return {
+    roles: (data.data?.roles ?? []) as AdminOrgRoleDefinition[],
+    portalSections: (data.data?.portalSections ?? []) as PortalSectionKey[],
+  };
+}
+
+export async function createAdminOrgRole(payload: {
+  label: string;
+  key?: string;
+  portalSections: PortalSectionKey[];
+}): Promise<AdminOrgRoleDefinition> {
+  const response = await fetch(`${API_URL}/auth/admin/org-roles`, {
+    method: "POST",
+    headers: getAdminAuthHeaders(),
+    body: JSON.stringify(payload),
+  });
+  const data = await response.json();
+  if (!response.ok) {
+    throw new Error(data.message || "Failed to create role");
+  }
+  return data.data as AdminOrgRoleDefinition;
+}
+
+export async function updateAdminOrgRole(
+  key: string,
+  payload: {
+    label?: string;
+    portalSections?: PortalSectionKey[];
+    isActive?: boolean;
+    sortOrder?: number;
+  }
+): Promise<AdminOrgRoleDefinition> {
+  const response = await fetch(
+    `${API_URL}/auth/admin/org-roles/${encodeURIComponent(key)}`,
+    {
+      method: "PATCH",
+      headers: getAdminAuthHeaders(),
+      body: JSON.stringify(payload),
+    }
+  );
+  const data = await response.json();
+  if (!response.ok) {
+    throw new Error(data.message || "Failed to update role");
+  }
+  return data.data as AdminOrgRoleDefinition;
 }
 
 export async function getAdminAnalytics(): Promise<AdminAnalytics> {
@@ -425,6 +515,46 @@ export async function removeStudent(userId: string, reason: string): Promise<voi
   const data = await response.json();
   if (!response.ok) {
     throw new Error(data.message || "Failed to remove student");
+  }
+}
+
+export async function deactivateStudent(
+  userId: string,
+  days: DeactivationDays,
+  reason: string
+): Promise<{ deactivatedUntil: string | null; days: number }> {
+  const response = await fetch(
+    `${API_URL}/admin/users/${encodeURIComponent(userId)}/deactivate`,
+    {
+      method: "POST",
+      headers: getAdminAuthHeaders(),
+      body: JSON.stringify({ days, reason: reason.trim() }),
+    }
+  );
+
+  const data = await response.json();
+  if (!response.ok) {
+    throw new Error(data.message || "Failed to deactivate student");
+  }
+
+  return {
+    deactivatedUntil: data.data?.deactivatedUntil ?? null,
+    days: data.data?.days ?? days,
+  };
+}
+
+export async function reactivateStudent(userId: string): Promise<void> {
+  const response = await fetch(
+    `${API_URL}/admin/users/${encodeURIComponent(userId)}/reactivate`,
+    {
+      method: "POST",
+      headers: getAdminAuthHeaders(),
+    }
+  );
+
+  const data = await response.json();
+  if (!response.ok) {
+    throw new Error(data.message || "Failed to reactivate student");
   }
 }
 

@@ -30,6 +30,7 @@ import {
   getAdminProfile,
   getCachedAdminProfile,
   isAdminAuthenticated,
+  recordAdminLogout,
   restoreAdminSessionIfNeeded,
   type AdminProfile,
 } from "@/services/adminService";
@@ -198,8 +199,11 @@ export default function AdminLayout({
   );
 
   const handleSignOut = () => {
-    clearAdminSession();
-    router.push("/admin/auth/login");
+    void (async () => {
+      await recordAdminLogout();
+      clearAdminSession();
+      router.push("/admin/auth/login");
+    })();
   };
 
   if (isAuthPage) {

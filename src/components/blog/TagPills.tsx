@@ -21,7 +21,7 @@ export function TagPills({ tags, activeTag = null, onTagClick, size = "sm", link
         : "rounded-full px-3 py-1 text-xs font-bold transition";
     return active
       ? `${base} bg-[#1E3FE0] text-white shadow-sm dark:bg-[#60A5FA] dark:text-[#070B19]`
-      : `${base} border border-black/10 bg-white/70 text-[#2A2A28] hover:border-[#1E3FE0] hover:text-[#1E3FE0] dark:border-white/10 dark:bg-white/10 dark:text-slate-200 dark:hover:text-[#60A5FA]`;
+      : `${base} border border-black/10 bg-[#F6F1E4] text-[#2A2A28] hover:border-[#1E3FE0] hover:text-[#1E3FE0] dark:border-white/10 dark:bg-[#0D1B2A] dark:text-slate-200 dark:hover:text-[#60A5FA]`;
   };
 
   return (

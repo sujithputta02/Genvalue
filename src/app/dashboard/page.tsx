@@ -138,18 +138,18 @@ export default function StudentDashboardPage() {
   const showEnrollmentCard = enrollment !== null;
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 sm:space-y-8">
       {/* Welcome Header */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="flex flex-col gap-4 rounded-3xl border border-black/10 bg-[#F6F1E4] p-6 shadow-xl dark:border-white/10 dark:bg-[#0D1B2A] sm:flex-row sm:items-center sm:justify-between lg:p-8"
+        className="flex flex-col gap-4 rounded-2xl border border-black/10 bg-[#F6F1E4] p-4 shadow-xl dark:border-white/10 dark:bg-[#0D1B2A] sm:rounded-3xl sm:p-6 sm:flex-row sm:items-center sm:justify-between lg:p-8"
       >
-        <div>
-          <span className="font-annotation inline-block -rotate-2 text-xs font-bold uppercase tracking-widest text-[#E8622E]">
+        <div className="min-w-0">
+          <span className="font-annotation inline-block -rotate-2 text-[10px] font-bold uppercase tracking-widest text-[#E8622E] sm:text-xs">
             ★ STUDENT LEARNING PORTAL
           </span>
-          <h1 className="font-display-custom mt-1 text-2xl font-extrabold tracking-tight text-[#2A2A28] dark:text-white sm:text-3xl lg:text-4xl">
+          <h1 className="font-display-custom mt-1 text-xl font-extrabold tracking-tight text-[#2A2A28] dark:text-white sm:text-3xl lg:text-4xl">
             Welcome back, {firstName}! 👋
           </h1>
           {showEnrollmentCard ? (
@@ -166,7 +166,7 @@ export default function StudentDashboardPage() {
         {showEnrollmentCard && (
           <Link
             href="/dashboard/courses/ai-tools-mastery/lessons/les-w1-1"
-            className="inline-flex items-center justify-center gap-2 rounded-full bg-[#1E3FE0] px-6 py-3.5 text-xs font-bold uppercase tracking-wider text-white shadow-xl transition hover:bg-[#1530b5] dark:bg-[#60A5FA] dark:text-[#070B19]"
+            className="inline-flex w-full shrink-0 items-center justify-center gap-2 rounded-full bg-[#1E3FE0] px-6 py-3.5 text-xs font-bold uppercase tracking-wider text-white shadow-xl transition hover:bg-[#1530b5] dark:bg-[#60A5FA] dark:text-[#070B19] sm:w-auto"
           >
             <FaPlay className="h-3 w-3" />
             <span>Start Learning</span>
@@ -175,8 +175,8 @@ export default function StudentDashboardPage() {
       </motion.div>
 
       {/* Progress & Stat Cards Grid */}
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-        <div className="rounded-2xl border border-black/10 bg-[#F6F1E4] p-6 shadow-lg dark:border-white/10 dark:bg-[#0D1B2A]">
+      <div className="grid grid-cols-1 gap-3 min-[420px]:grid-cols-2 sm:gap-6 lg:grid-cols-4">
+        <div className="rounded-2xl border border-black/10 bg-[#F6F1E4] p-4 shadow-lg dark:border-white/10 dark:bg-[#0D1B2A] sm:p-6">
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold uppercase tracking-wider text-[#6B6558] dark:text-slate-400">Course Progress</span>
             <FaBookOpen className="h-5 w-5 text-[#1E3FE0] dark:text-[#60A5FA]" />
@@ -187,7 +187,7 @@ export default function StudentDashboardPage() {
           </div>
         </div>
 
-        <div className="rounded-2xl border border-black/10 bg-[#F6F1E4] p-6 shadow-lg dark:border-white/10 dark:bg-[#0D1B2A]">
+        <div className="rounded-2xl border border-black/10 bg-[#F6F1E4] p-4 shadow-lg dark:border-white/10 dark:bg-[#0D1B2A] sm:p-6">
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold uppercase tracking-wider text-[#6B6558] dark:text-slate-400">Lessons Done</span>
             <FaCircleCheck className="h-5 w-5 text-[#10B981]" />
@@ -198,7 +198,7 @@ export default function StudentDashboardPage() {
           <p className="mt-2 text-[10px] font-bold text-[#6B6558] dark:text-slate-400">{progress.completedModules} / {progress.totalModules} Modules Finished</p>
         </div>
 
-        <div className="rounded-2xl border border-black/10 bg-[#F6F1E4] p-6 shadow-lg dark:border-white/10 dark:bg-[#0D1B2A]">
+        <div className="rounded-2xl border border-black/10 bg-[#F6F1E4] p-4 shadow-lg dark:border-white/10 dark:bg-[#0D1B2A] sm:p-6">
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold uppercase tracking-wider text-[#6B6558] dark:text-slate-400">Quiz Average</span>
             <FaListCheck className="h-5 w-5 text-[#E8622E]" />
@@ -211,7 +211,7 @@ export default function StudentDashboardPage() {
           </p>
         </div>
 
-        <div className="rounded-2xl border border-black/10 bg-[#F6F1E4] p-6 shadow-lg dark:border-white/10 dark:bg-[#0D1B2A]">
+        <div className="rounded-2xl border border-black/10 bg-[#F6F1E4] p-4 shadow-lg dark:border-white/10 dark:bg-[#0D1B2A] sm:p-6">
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold uppercase tracking-wider text-[#6B6558] dark:text-slate-400">Certificates</span>
             <FaAward className="h-5 w-5 text-amber-500" />
@@ -226,12 +226,12 @@ export default function StudentDashboardPage() {
       <StudentActivityPlannerSection />
 
       {/* Main Learning Timeline & Upcoming Tasks */}
-      <div className="grid gap-8 lg:grid-cols-3">
+      <div className="grid gap-6 lg:grid-cols-3 lg:gap-8">
         {/* Left 2 Cols: 12-Week Curriculum Status */}
         {showEnrollmentCard ? (
           <div className="space-y-4 lg:col-span-2">
-            <div className="flex items-center justify-between">
-              <h2 className="font-display-custom text-xl font-extrabold text-[#2A2A28] dark:text-white">
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+              <h2 className="font-display-custom text-lg font-extrabold text-[#2A2A28] dark:text-white sm:text-xl">
                 12-Week Curriculum Status
               </h2>
               <Link href="/dashboard/courses" className="text-xs font-bold text-[#1E3FE0] hover:underline dark:text-[#60A5FA]">
@@ -239,17 +239,17 @@ export default function StudentDashboardPage() {
               </Link>
             </div>
 
-            <div className="space-y-4">
+            <div className="space-y-3 sm:space-y-4">
               {MOCK_MODULES.map((mod) => (
                 <div
                   key={mod.id}
-                  className="flex flex-col gap-4 rounded-2xl border border-black/10 bg-[#F6F1E4] p-5 shadow-md dark:border-white/10 dark:bg-[#0D1B2A] sm:flex-row sm:items-center sm:justify-between"
+                  className="flex flex-col gap-3 rounded-2xl border border-black/10 bg-[#F6F1E4] p-4 shadow-md dark:border-white/10 dark:bg-[#0D1B2A] sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:p-5"
                 >
-                  <div className="flex items-start gap-3">
+                  <div className="flex min-w-0 items-start gap-3">
                     <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#1E3FE0] text-xs font-bold text-white shadow-md dark:bg-[#60A5FA] dark:text-[#070B19]">
                       W{mod.week}
                     </span>
-                    <div>
+                    <div className="min-w-0">
                       <h3 className="font-display-custom text-sm font-bold text-[#2A2A28] dark:text-white">{mod.title}</h3>
                       <p className="mt-1 text-xs text-[#6B6558] dark:text-slate-300">{mod.description}</p>
                     </div>
@@ -257,7 +257,7 @@ export default function StudentDashboardPage() {
 
                   <Link
                     href={`/dashboard/courses/ai-tools-mastery/lessons/les-w${mod.week}-1`}
-                    className="inline-flex shrink-0 items-center gap-1.5 rounded-xl border border-black/10 bg-white px-4 py-2 text-xs font-bold text-[#2A2A28] transition hover:bg-black/5 dark:border-white/10 dark:bg-white/10 dark:text-white"
+                    className="inline-flex w-full shrink-0 items-center justify-center gap-1.5 rounded-xl border border-black/10 bg-white px-4 py-2.5 text-xs font-bold text-[#2A2A28] transition hover:bg-black/5 dark:border-white/10 dark:bg-white/10 dark:text-white sm:w-auto"
                   >
                     <span>Start Week</span>
                     <FaArrowRight className="h-3 w-3 text-[#1E3FE0] dark:text-[#60A5FA]" />
@@ -268,10 +268,10 @@ export default function StudentDashboardPage() {
           </div>
         ) : (
           <div className="space-y-4 lg:col-span-2">
-            <div className="flex flex-col items-center justify-center gap-6 rounded-3xl border border-dashed border-black/20 bg-[#F6F1E4]/50 p-12 text-center dark:border-white/20 dark:bg-[#0D1B2A]/50">
-              <FaBookOpen className="h-16 w-16 text-[#1E3FE0]/30 dark:text-[#60A5FA]/30" />
+            <div className="flex flex-col items-center justify-center gap-6 rounded-2xl border border-dashed border-black/20 bg-[#F6F1E4]/50 p-6 text-center dark:border-white/20 dark:bg-[#0D1B2A]/50 sm:rounded-3xl sm:p-12">
+              <FaBookOpen className="h-12 w-12 text-[#1E3FE0]/30 dark:text-[#60A5FA]/30 sm:h-16 sm:w-16" />
               <div>
-                <h2 className="font-display-custom text-xl font-bold text-[#2A2A28] dark:text-white">
+                <h2 className="font-display-custom text-lg font-bold text-[#2A2A28] dark:text-white sm:text-xl">
                   No Courses Enrolled Yet
                 </h2>
                 <p className="mt-2 text-sm text-[#6B6558] dark:text-slate-400">
@@ -280,7 +280,7 @@ export default function StudentDashboardPage() {
               </div>
               <Link
                 href="/dashboard/browse-courses"
-                className="inline-flex items-center gap-2 rounded-full bg-[#1E3FE0] px-8 py-3 text-sm font-bold text-white shadow-lg transition hover:bg-[#12266E]"
+                className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#1E3FE0] px-8 py-3 text-sm font-bold text-white shadow-lg transition hover:bg-[#12266E] sm:w-auto"
               >
                 <FaArrowRight className="h-4 w-4" />
                 Browse Courses
@@ -290,8 +290,8 @@ export default function StudentDashboardPage() {
         )}
 
         {/* Right Col: Announcements */}
-        <div className="space-y-6">
-          <div className="rounded-2xl border border-black/10 bg-[#F6F1E4] p-6 shadow-xl dark:border-white/10 dark:bg-[#0D1B2A]">
+        <div className="space-y-4 sm:space-y-6">
+          <div className="rounded-2xl border border-black/10 bg-[#F6F1E4] p-4 shadow-xl dark:border-white/10 dark:bg-[#0D1B2A] sm:p-6">
             <h3 className="font-display-custom text-base font-bold text-[#2A2A28] dark:text-white">
               Upcoming Deadlines
             </h3>
@@ -302,7 +302,7 @@ export default function StudentDashboardPage() {
             </div>
           </div>
 
-          <div className="rounded-2xl border border-black/10 bg-[#F6F1E4] p-6 shadow-xl dark:border-white/10 dark:bg-[#0D1B2A]">
+          <div className="rounded-2xl border border-black/10 bg-[#F6F1E4] p-4 shadow-xl dark:border-white/10 dark:bg-[#0D1B2A] sm:p-6">
             <h3 className="font-display-custom text-base font-bold text-[#2A2A28] dark:text-white">
               Announcements
             </h3>
@@ -312,7 +312,7 @@ export default function StudentDashboardPage() {
                 {announcementItems.map((announcement) => (
                   <div
                     key={announcement.id}
-                    className="rounded-2xl border border-black/10 bg-[#12266E] p-5 text-white shadow-lg dark:border-white/10"
+                    className="rounded-2xl border border-black/10 bg-[#12266E] p-4 text-white shadow-lg dark:border-white/10 sm:p-5"
                   >
                     <span className="font-annotation text-xs font-bold text-[#E8622E]">
                       ★ {formatAnnouncementLabel(announcement.type)}

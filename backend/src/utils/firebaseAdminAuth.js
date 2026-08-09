@@ -79,6 +79,68 @@ export function canRevokeFirebaseUsers() {
 }
 
 /**
+ * Whether a Firebase Auth user still exists for the given UID.
+ * @returns {'active' | 'missing' | 'unavailable'}
+ */
+export async function getFirebaseAuthUserStatus(adminAuth, firebaseUid) {
+  if (isSyntheticFirebaseUid(firebaseUid)) {
+    return "missing";
+  }
+
+  if (!firebaseAdminCredentialsLoaded) {
+    return "unavailable";
+  }
+
+  const ready = await probeFirebaseAdminAuth(adminAuth);
+  if (!ready) {
+    return "unavailable";
+  }
+
+  try {
+    await adminAuth.getUser(firebaseUid);
+    return "active";
+  } catch (error) {
+    if (error?.code === "auth/user-not-found") {
+      return "missing";
+    }
+    console.warn(
+      "[firebase] getUser status check failed:",
+      error?.message ?? error
+    );
+    return "unavailable";
+  }
+}
+
+/**
+ * Enable or disable a Firebase Auth user (temporary deactivation).
+ * Safe when Admin SDK is unavailable — returns skipped.
+ */
+export async function setFirebaseAuthUserDisabled(adminAuth, firebaseUid, disabled) {
+  if (isSyntheticFirebaseUid(firebaseUid)) {
+    return { status: "skipped", reason: "synthetic_uid" };
+  }
+
+  if (!firebaseAdminCredentialsLoaded) {
+    return { status: "skipped", reason: "credentials_missing" };
+  }
+
+  const ready = await probeFirebaseAdminAuth(adminAuth);
+  if (!ready) {
+    return { status: "skipped", reason: "auth_unavailable" };
+  }
+
+  try {
+    await adminAuth.updateUser(firebaseUid, { disabled: Boolean(disabled) });
+    return { status: disabled ? "disabled" : "enabled" };
+  } catch (error) {
+    if (error?.code === "auth/user-not-found") {
+      return { status: "skipped", reason: "user_not_found" };
+    }
+    throw error;
+  }
+}
+
+/**
  * Disable + delete a Firebase Auth user. Safe to call when Admin is unavailable.
  */
 export async function revokeFirebaseAuthUser(adminAuth, firebaseUid) {

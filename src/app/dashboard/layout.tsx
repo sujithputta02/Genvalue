@@ -61,8 +61,30 @@ export default function StudentDashboardLayout({
   const [userData, setUserData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
+  const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
   const [notificationCount, setNotificationCount] = useState(0);
   const navbarRef = useRef<HTMLDivElement>(null);
+  const mobileSearchInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (!mobileSearchOpen) return;
+    mobileSearchInputRef.current?.focus();
+  }, [mobileSearchOpen]);
+
+  useEffect(() => {
+    // Keep desktop search mode closed when viewport grows
+    const mq = window.matchMedia("(min-width: 1024px)");
+    const onChange = () => {
+      if (mq.matches) setMobileSearchOpen(false);
+    };
+    mq.addEventListener("change", onChange);
+    return () => mq.removeEventListener("change", onChange);
+  }, []);
+
+  const closeMobileSearch = () => {
+    setMobileSearchOpen(false);
+    setSearchQuery("");
+  };
 
   // Fetch unread notification count
   useEffect(() => {
@@ -195,7 +217,7 @@ export default function StudentDashboardLayout({
   }
 
   return (
-    <div className="flex h-screen overflow-hidden bg-[#EDE6D3] text-[#2A2A28] dark:bg-[#070B19] dark:text-slate-200">
+    <div className="flex h-dvh overflow-hidden bg-[#EDE6D3] text-[#2A2A28] dark:bg-[#070B19] dark:text-slate-200">
       <div
         className="pointer-events-none fixed inset-0 opacity-[0.04] [background-image:linear-gradient(#000_1px,transparent_1px),linear-gradient(90deg,#000_1px,transparent_1px)] [background-size:24px_24px] dark:opacity-[0.06] dark:[background-image:linear-gradient(#fff_1px,transparent_1px),linear-gradient(90deg,#fff_1px,transparent_1px)]"
         aria-hidden="true"
@@ -203,34 +225,36 @@ export default function StudentDashboardLayout({
 
       {/* Desktop Sidebar - Can be fully hidden */}
       {sidebarOpen && (
-        <aside className={`relative hidden h-screen shrink-0 flex-col justify-between overflow-y-auto border-r border-black/10 bg-[#F6F1E4] p-6 transition-all duration-300 dark:border-white/10 dark:bg-[#0D1B2A] lg:flex ${sidebarCollapsed ? 'w-20' : 'w-64'}`}>
+        <aside className={`relative hidden h-dvh shrink-0 flex-col justify-between overflow-y-auto border-r border-black/10 bg-[#F6F1E4] p-4 transition-all duration-300 dark:border-white/10 dark:bg-[#0D1B2A] lg:flex xl:p-6 ${sidebarCollapsed ? "w-20" : "w-60 xl:w-64"}`}>
           <div>
-            <div className="flex items-center justify-between">
-              <Link href="/" className={`flex items-center gap-2 px-2 py-1 ${sidebarCollapsed ? 'hidden' : ''}`} onClick={(e) => e.preventDefault()}>
-                <div className="relative h-9 w-9">
+            <div className="flex items-center justify-between gap-2">
+              <Link href="/" className={`flex min-w-0 items-center gap-2 px-2 py-1 ${sidebarCollapsed ? "hidden" : ""}`} onClick={(e) => e.preventDefault()}>
+                <div className="relative h-9 w-9 shrink-0">
                   <Image src="/Genvalue Light.svg" alt="GenValue Logo" fill className="object-contain dark:hidden" priority loading="eager" />
                   <Image src="/Genvalue Dark.svg" alt="GenValue Logo" fill className="hidden object-contain dark:block" priority loading="eager" />
                 </div>
-                <span className="font-display-custom text-xl font-extrabold tracking-tight">
+                <span className="font-display-custom truncate text-lg font-extrabold tracking-tight xl:text-xl">
                   <span className="text-[#2A2A28] dark:text-white">Gen</span>
                   <span className="text-[#1E3FE0] dark:text-[#60A5FA]">Value</span>
                 </span>
-                <span className="ml-1 rounded-full bg-[#1E3FE0]/10 px-2 py-0.5 text-[10px] font-extrabold uppercase text-[#1E3FE0] dark:bg-[#60A5FA]/20 dark:text-[#60A5FA]">
+                <span className="ml-1 shrink-0 rounded-full bg-[#1E3FE0]/10 px-2 py-0.5 text-[10px] font-extrabold uppercase text-[#1E3FE0] dark:bg-[#60A5FA]/20 dark:text-[#60A5FA]">
                   LMS
                 </span>
               </Link>
               
               {/* Close (X) Button */}
               <button
+                type="button"
                 onClick={() => setSidebarOpen(false)}
-                className="rounded-lg p-2 hover:bg-black/5 dark:hover:bg-white/5"
+                className="shrink-0 rounded-lg p-2 hover:bg-black/5 dark:hover:bg-white/5"
+                aria-label="Close sidebar"
                 title="Close sidebar"
               >
                 <FaXmark className="h-5 w-5 text-[#2A2A28] dark:text-white" />
               </button>
             </div>
 
-          <nav className="mt-8 space-y-1.5">
+          <nav className="mt-6 space-y-1 xl:mt-8 xl:space-y-1.5" aria-label="LMS primary">
             {navItems.map((item) => {
               const active =
                 pathname === item.href ||
@@ -239,15 +263,16 @@ export default function StudentDashboardLayout({
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`flex items-center gap-3 rounded-2xl px-4 py-3 text-xs font-bold transition ${
+                  className={`flex items-center gap-3 rounded-2xl px-3 py-2.5 text-xs font-bold transition xl:px-4 xl:py-3 ${
                     active
                       ? "bg-[#1E3FE0] text-white shadow-md dark:bg-[#60A5FA] dark:text-[#070B19]"
                       : "text-[#6B6558] hover:bg-black/5 dark:text-slate-300 dark:hover:bg-white/5"
-                  } ${sidebarCollapsed ? 'justify-center' : ''}`}
+                  } ${sidebarCollapsed ? "justify-center px-2" : ""}`}
                   title={sidebarCollapsed ? item.label : undefined}
+                  aria-current={active ? "page" : undefined}
                 >
-                  <item.Icon className="h-4 w-4" />
-                  {!sidebarCollapsed && <span>{item.label}</span>}
+                  <item.Icon className="h-4 w-4 shrink-0" />
+                  {!sidebarCollapsed && <span className="truncate">{item.label}</span>}
                 </Link>
               );
             })}
@@ -306,38 +331,44 @@ export default function StudentDashboardLayout({
               exit={{ opacity: 0 }}
               onClick={() => setMobileOpen(false)}
               className="fixed inset-0 bg-black/60 backdrop-blur-sm lg:hidden"
-              style={{ zIndex: 40 }}
+              style={{ zIndex: 60 }}
             />
             <motion.aside
               initial={{ x: -280 }}
               animate={{ x: 0 }}
               exit={{ x: -280 }}
               transition={{ type: "spring", damping: 25, stiffness: 200 }}
-              className="fixed left-0 top-0 h-screen w-72 overflow-y-auto border-r border-black/10 bg-[#F6F1E4] p-6 shadow-2xl dark:border-white/10 dark:bg-[#0D1B2A] lg:hidden"
-              style={{ zIndex: 50 }}
+              className="fixed left-0 top-0 h-dvh w-[min(18rem,88vw)] overflow-y-auto overscroll-contain border-r border-black/10 bg-[#F6F1E4] p-4 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-[max(1.25rem,env(safe-area-inset-top))] shadow-2xl dark:border-white/10 dark:bg-[#0D1B2A] sm:p-6 lg:hidden"
+              style={{ zIndex: 70 }}
+              aria-label="Mobile navigation"
             >
               <div className="flex h-full flex-col justify-between">
 
                 <div>
-                  <div className="mb-6 flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <div className="relative h-9 w-9">
+                  <div className="mb-5 flex items-center justify-between gap-2 sm:mb-6">
+                    <div className="flex min-w-0 items-center gap-2">
+                      <div className="relative h-8 w-8 shrink-0 sm:h-9 sm:w-9">
                         <Image src="/Genvalue Light.svg" alt="GenValue Logo" fill className="object-contain dark:hidden" priority loading="eager" />
                         <Image src="/Genvalue Dark.svg" alt="GenValue Logo" fill className="hidden object-contain dark:block" priority loading="eager" />
                       </div>
-                      <span className="font-display-custom text-xl font-extrabold tracking-tight">
+                      <span className="font-display-custom truncate text-lg font-extrabold tracking-tight sm:text-xl">
                         <span className="text-[#2A2A28] dark:text-white">Gen</span>
                         <span className="text-[#1E3FE0] dark:text-[#60A5FA]">Value</span>
                       </span>
-                      <span className="ml-1 rounded-full bg-[#1E3FE0]/10 px-2 py-0.5 text-[10px] font-extrabold uppercase text-[#1E3FE0] dark:bg-[#60A5FA]/20 dark:text-[#60A5FA]">
+                      <span className="hidden shrink-0 rounded-full bg-[#1E3FE0]/10 px-2 py-0.5 text-[10px] font-extrabold uppercase text-[#1E3FE0] min-[380px]:inline-block dark:bg-[#60A5FA]/20 dark:text-[#60A5FA]">
                         LMS
                       </span>
                     </div>
-                    <button onClick={() => setMobileOpen(false)} className="rounded-lg p-2 hover:bg-black/5 dark:hover:bg-white/5">
+                    <button
+                      type="button"
+                      onClick={() => setMobileOpen(false)}
+                      className="shrink-0 rounded-lg p-2 hover:bg-black/5 dark:hover:bg-white/5"
+                      aria-label="Close navigation menu"
+                    >
                       <FaXmark className="h-5 w-5" />
                     </button>
                   </div>
-                  <nav className="space-y-1.5">
+                  <nav className="space-y-1 sm:space-y-1.5" aria-label="Mobile primary">
                     {navItems.map((item) => {
                       const active =
                         pathname === item.href ||
@@ -347,14 +378,15 @@ export default function StudentDashboardLayout({
                           key={item.href}
                           href={item.href}
                           onClick={() => setMobileOpen(false)}
-                          className={`flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-bold transition ${
+                          className={`flex items-center gap-3 rounded-2xl px-3 py-2.5 text-sm font-bold transition sm:px-4 sm:py-3 ${
                             active
                               ? "bg-[#1E3FE0] text-white shadow-md dark:bg-[#60A5FA] dark:text-[#070B19]"
                               : "text-[#6B6558] hover:bg-black/5 dark:text-slate-300 dark:hover:bg-white/5"
                           }`}
+                          aria-current={active ? "page" : undefined}
                         >
-                          <item.Icon className="h-5 w-5" />
-                          <span>{item.label}</span>
+                          <item.Icon className="h-5 w-5 shrink-0" />
+                          <span className="truncate">{item.label}</span>
                         </Link>
                       );
                     })}
@@ -383,107 +415,135 @@ export default function StudentDashboardLayout({
         )}
       </AnimatePresence>
 
-      <div className="relative min-w-0 flex-1 overflow-y-auto">
-        <header className="sticky top-4 z-50 px-4 pb-4 sm:px-6 sm:pb-5">
+      <div className="relative min-w-0 flex-1 overflow-x-hidden overflow-y-auto">
+        <header className="sticky top-3 z-50 px-3 pb-2 sm:top-4 sm:px-6 sm:pb-3">
           <div
             ref={navbarRef}
-            className="liquid-glass-navbar mx-auto flex max-w-[1240px] items-center justify-between gap-3 rounded-full px-4 py-2.5 shadow-md transition-all duration-300 sm:gap-4 sm:px-5"
+            className="liquid-glass-navbar mx-auto flex max-w-[1240px] items-center justify-between gap-2 rounded-full px-3 py-2 shadow-md transition-all duration-300 sm:gap-4 sm:px-5 sm:py-2.5"
           >
-            <div className="flex min-w-0 items-center gap-2 sm:gap-3">
-              {!sidebarOpen && (
+            {/* Mobile search mode — replaces bar contents until cancel */}
+            {mobileSearchOpen ? (
+              <div className="flex w-full min-w-0 items-center gap-2 lg:hidden">
+                <div className="relative min-w-0 flex-1">
+                  <FaMagnifyingGlass className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#6B6558] dark:text-slate-400" />
+                  <input
+                    ref={mobileSearchInputRef}
+                    type="search"
+                    placeholder="Search courses, quizzes..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Escape") closeMobileSearch();
+                    }}
+                    aria-label="Search courses and quizzes"
+                    className="w-full rounded-full border border-black/10 bg-white/50 py-2 pl-9 pr-3 text-base font-medium text-[#2A2A28] placeholder:text-[#6B6558]/60 outline-none transition focus:border-[#1E3FE0] focus:bg-white/80 dark:border-white/10 dark:bg-white/10 dark:text-white dark:placeholder:text-slate-400/60 dark:focus:border-[#60A5FA] sm:text-sm"
+                  />
+                </div>
                 <button
                   type="button"
-                  onClick={() => {
-                    setSidebarOpen(true);
-                    setSidebarCollapsed(false);
-                  }}
-                  aria-label="Open sidebar"
-                  className="hidden rounded-full p-2 text-[#2A2A28] transition-colors hover:bg-black/5 dark:text-white dark:hover:bg-white/10 lg:inline-flex"
+                  onClick={closeMobileSearch}
+                  aria-label="Cancel search"
+                  className="shrink-0 rounded-full px-2.5 py-2 text-xs font-bold text-[#1E3FE0] transition-colors hover:bg-black/5 dark:text-[#60A5FA] dark:hover:bg-white/10"
                 >
-                  <FaBars className="h-5 w-5" />
+                  Cancel
                 </button>
-              )}
-
-              <button
-                type="button"
-                onClick={() => setMobileOpen(!mobileOpen)}
-                aria-label="Open navigation menu"
-                className="inline-flex rounded-full p-2 text-[#2A2A28] transition-colors hover:bg-black/5 dark:text-white dark:hover:bg-white/10 lg:hidden"
-              >
-                <FaBars className="h-5 w-5" />
-              </button>
-
-              <Link href={portalRoot} className="flex shrink-0 items-center gap-2" aria-label="GenValue LMS home">
-                <div className="relative h-7 w-7 sm:h-8 sm:w-8">
-                  <Image src="/Genvalue Light.svg" alt="GenValue Logo" fill className="object-contain dark:hidden" priority loading="eager" />
-                  <Image src="/Genvalue Dark.svg" alt="GenValue Logo" fill className="hidden object-contain dark:block" priority loading="eager" />
-                </div>
-                <span className="font-display-custom text-sm font-extrabold tracking-tight sm:text-base">
-                  <span className="text-[#2A2A28] dark:text-white">Gen</span>
-                  <span className="text-[#1E3FE0] dark:text-[#60A5FA]">Value</span>
-                  <span className="ml-1.5 rounded-full bg-[#1E3FE0]/10 px-2 py-0.5 text-[10px] font-extrabold uppercase text-[#1E3FE0] dark:bg-[#60A5FA]/10 dark:text-[#60A5FA]">
-                    LMS
-                  </span>
-                </span>
-              </Link>
-            </div>
-
-            <div className="hidden min-w-0 flex-1 max-w-md lg:block">
-              <div className="relative">
-                <FaMagnifyingGlass className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[#6B6558] dark:text-slate-400" />
-                <input
-                  type="search"
-                  placeholder="Search courses, quizzes, assignments..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  aria-label="Search courses, quizzes, and assignments"
-                  className="w-full rounded-full border border-black/10 bg-white/40 py-2 pl-11 pr-4 text-sm font-medium text-[#2A2A28] placeholder:text-[#6B6558]/60 outline-none transition focus:border-[#1E3FE0] focus:bg-white/70 dark:border-white/10 dark:bg-white/10 dark:text-white dark:placeholder:text-slate-400/60 dark:focus:border-[#60A5FA] dark:focus:bg-white/20"
-                />
               </div>
-            </div>
+            ) : (
+              <>
+                <div className="flex min-w-0 items-center gap-1.5 sm:gap-3">
+                  {!sidebarOpen && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSidebarOpen(true);
+                        setSidebarCollapsed(false);
+                      }}
+                      aria-label="Open sidebar"
+                      className="hidden rounded-full p-2 text-[#2A2A28] transition-colors hover:bg-black/5 dark:text-white dark:hover:bg-white/10 lg:inline-flex"
+                    >
+                      <FaBars className="h-5 w-5" />
+                    </button>
+                  )}
 
-            <div className="flex shrink-0 items-center gap-2 sm:gap-3">
-              <Link
-                href={toPortal("/dashboard/notifications")}
-                aria-label={`Notifications${notificationCount > 0 ? `, ${notificationCount} unread` : ""}`}
-                className="relative rounded-full p-2 text-[#2A2A28] transition-colors hover:bg-black/5 dark:text-white dark:hover:bg-white/10"
-              >
-                <FaBell className="h-5 w-5" />
-                {notificationCount > 0 && (
-                  <span className="absolute -right-0.5 -top-0.5 flex h-5 w-5 items-center justify-center rounded-full bg-[#E8622E] text-[10px] font-bold text-white">
-                    {notificationCount > 99 ? "99+" : notificationCount}
-                  </span>
-                )}
-              </Link>
-              <Link
-                href={toPortal("/dashboard/profile")}
-                aria-label="My profile"
-                className="hidden shrink-0 rounded-full p-0.5 transition hover:ring-2 hover:ring-[#1E3FE0]/20 dark:hover:ring-[#60A5FA]/20 lg:block"
-              >
-                <Avatar
-                  src={userData?.profilePicture}
-                  name={userData?.name || "User"}
-                  size="sm"
-                  className="border-2 border-white/80 ring-1 ring-black/5 dark:border-white/20 dark:ring-white/10"
-                />
-              </Link>
-            </div>
-          </div>
+                  <button
+                    type="button"
+                    onClick={() => setMobileOpen(!mobileOpen)}
+                    aria-label={mobileOpen ? "Close navigation menu" : "Open navigation menu"}
+                    aria-expanded={mobileOpen}
+                    className="inline-flex rounded-full p-2 text-[#2A2A28] transition-colors hover:bg-black/5 dark:text-white dark:hover:bg-white/10 lg:hidden"
+                  >
+                    <FaBars className="h-5 w-5" />
+                  </button>
 
-          <div className="relative mx-auto mt-2 max-w-[1240px] lg:hidden">
-            <FaMagnifyingGlass className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[#6B6558] dark:text-slate-400" />
-            <input
-              type="search"
-              placeholder="Search courses, quizzes..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              aria-label="Search courses and quizzes"
-              className="w-full rounded-full border border-black/10 bg-[#F6F1E4]/80 py-2.5 pl-11 pr-4 text-sm font-medium text-[#2A2A28] placeholder:text-[#6B6558]/60 outline-none backdrop-blur-sm transition focus:border-[#1E3FE0] focus:bg-white dark:border-white/10 dark:bg-[#0D1B2A]/80 dark:text-white dark:placeholder:text-slate-400/60 dark:focus:border-[#60A5FA]"
-            />
+                  <Link href={portalRoot} className="flex min-w-0 shrink items-center gap-1.5 sm:gap-2" aria-label="GenValue LMS home">
+                    <div className="relative h-7 w-7 shrink-0 sm:h-8 sm:w-8">
+                      <Image src="/Genvalue Light.svg" alt="GenValue Logo" fill className="object-contain dark:hidden" priority loading="eager" />
+                      <Image src="/Genvalue Dark.svg" alt="GenValue Logo" fill className="hidden object-contain dark:block" priority loading="eager" />
+                    </div>
+                    <span className="font-display-custom hidden truncate text-sm font-extrabold tracking-tight min-[360px]:inline sm:text-base">
+                      <span className="text-[#2A2A28] dark:text-white">Gen</span>
+                      <span className="text-[#1E3FE0] dark:text-[#60A5FA]">Value</span>
+                      <span className="ml-1.5 hidden rounded-full bg-[#1E3FE0]/10 px-2 py-0.5 text-[10px] font-extrabold uppercase text-[#1E3FE0] sm:inline dark:bg-[#60A5FA]/10 dark:text-[#60A5FA]">
+                        LMS
+                      </span>
+                    </span>
+                  </Link>
+                </div>
+
+                <div className="hidden min-w-0 flex-1 max-w-md lg:block">
+                  <div className="relative">
+                    <FaMagnifyingGlass className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[#6B6558] dark:text-slate-400" />
+                    <input
+                      type="search"
+                      placeholder="Search courses, quizzes, assignments..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      aria-label="Search courses, quizzes, and assignments"
+                      className="w-full rounded-full border border-black/10 bg-white/40 py-2 pl-11 pr-4 text-sm font-medium text-[#2A2A28] placeholder:text-[#6B6558]/60 outline-none transition focus:border-[#1E3FE0] focus:bg-white/70 dark:border-white/10 dark:bg-white/10 dark:text-white dark:placeholder:text-slate-400/60 dark:focus:border-[#60A5FA] dark:focus:bg-white/20"
+                    />
+                  </div>
+                </div>
+
+                <div className="flex shrink-0 items-center gap-1 sm:gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setMobileSearchOpen(true)}
+                    aria-label="Open search"
+                    className="inline-flex rounded-full p-2 text-[#2A2A28] transition-colors hover:bg-black/5 dark:text-white dark:hover:bg-white/10 lg:hidden"
+                  >
+                    <FaMagnifyingGlass className="h-5 w-5" />
+                  </button>
+                  <Link
+                    href={toPortal("/dashboard/notifications")}
+                    aria-label={`Notifications${notificationCount > 0 ? `, ${notificationCount} unread` : ""}`}
+                    className="relative rounded-full p-2 text-[#2A2A28] transition-colors hover:bg-black/5 dark:text-white dark:hover:bg-white/10"
+                  >
+                    <FaBell className="h-5 w-5" />
+                    {notificationCount > 0 && (
+                      <span className="absolute -right-0.5 -top-0.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-[#E8622E] px-1 text-[10px] font-bold text-white">
+                        {notificationCount > 99 ? "99+" : notificationCount}
+                      </span>
+                    )}
+                  </Link>
+                  <Link
+                    href={toPortal("/dashboard/profile")}
+                    aria-label="My profile"
+                    className="shrink-0 rounded-full p-0.5 transition hover:ring-2 hover:ring-[#1E3FE0]/20 dark:hover:ring-[#60A5FA]/20"
+                  >
+                    <Avatar
+                      src={userData?.profilePicture}
+                      name={userData?.name || "User"}
+                      size="sm"
+                      className="border-2 border-white/80 ring-1 ring-black/5 dark:border-white/20 dark:ring-white/10"
+                    />
+                  </Link>
+                </div>
+              </>
+            )}
           </div>
         </header>
 
-        <main className="px-4 pb-10 pt-2 sm:px-6 sm:pt-4 lg:px-8">{children}</main>
+        <main className="mx-auto max-w-[1240px] px-3 pb-10 pt-4 sm:px-6 sm:pt-5 lg:px-8">{children}</main>
       </div>
     </div>
   );

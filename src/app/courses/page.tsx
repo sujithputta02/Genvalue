@@ -108,20 +108,20 @@ export default function CoursesPage() {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="grid grid-cols-1 items-center gap-12 rounded-3xl border border-black/10 bg-[#F6F1E4] p-8 shadow-2xl dark:border-white/10 dark:bg-[#0D1B2A] lg:grid-cols-2 lg:p-12"
+          className="grid grid-cols-1 items-center gap-8 rounded-3xl border border-black/10 bg-[#F6F1E4] p-5 shadow-2xl dark:border-white/10 dark:bg-[#0D1B2A] sm:gap-10 sm:p-8 lg:grid-cols-2 lg:gap-12 lg:p-12"
         >
           <div>
             <span className="font-annotation inline-block -rotate-2 text-xs font-bold uppercase tracking-widest text-[#E8622E]">
               ★ FLAGSHIP PROGRAM
             </span>
-            <h1 className="font-display-custom mt-2 text-balance text-4xl font-extrabold tracking-tight text-[#2A2A28] dark:text-white sm:text-5xl md:text-6xl">
+            <h1 className="font-display-custom mt-2 text-balance text-3xl font-extrabold tracking-tight text-[#2A2A28] dark:text-white sm:text-5xl md:text-6xl">
               {course.title}
             </h1>
-            <p className="mt-4 text-lg font-medium leading-relaxed text-[#6B6558] dark:text-slate-300">
+            <p className="mt-3 text-base font-medium leading-relaxed text-[#6B6558] dark:text-slate-300 sm:text-lg">
               {course.subtitle}
             </p>
 
-            <div className="mt-6 flex flex-wrap gap-2.5">
+            <div className="mt-5 flex flex-wrap gap-2.5">
               {course.stats.map((stat) => (
                 <span
                   key={stat.label}
@@ -133,8 +133,8 @@ export default function CoursesPage() {
               ))}
             </div>
 
-            <div className="mt-8 flex flex-col items-stretch gap-4 sm:flex-row sm:items-center">
-              <EnrollNowLink className="inline-flex min-h-12 items-center justify-center rounded-full bg-[#E8622E] px-8 text-base font-bold uppercase tracking-wider text-white shadow-xl transition hover:bg-[#d55321]">
+            <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
+              <EnrollNowLink className="inline-flex h-12 w-full items-center justify-center whitespace-nowrap rounded-full bg-[#E8622E] px-6 text-sm font-bold uppercase tracking-wider text-white shadow-xl transition hover:bg-[#d55321] sm:h-14 sm:w-auto sm:px-8 sm:text-base">
                 Enroll Now
               </EnrollNowLink>
               <DownloadButton
@@ -143,12 +143,13 @@ export default function CoursesPage() {
                 label="Download Syllabus PDF"
                 variant="outline"
                 size="lg"
+                fullWidth
                 trackingLabel="Download GenValue syllabus PDF from courses page"
               />
             </div>
           </div>
 
-          <div className="relative mx-auto w-full max-w-md lg:mx-0 lg:max-w-none">
+          <div className="relative mx-auto w-full max-w-md overflow-hidden lg:mx-0 lg:max-w-none">
             <div className="-rotate-2 overflow-hidden rounded-2xl border border-black/10 shadow-2xl ring-4 ring-[#1E3FE0]/20 dark:border-white/10 dark:ring-white/10">
               <Image
                 src="/images/poster/genvalue-poster.png"
@@ -325,8 +326,8 @@ export default function CoursesPage() {
                   className="relative overflow-hidden rounded-2xl border border-black/10 bg-[#F6F1E4] shadow-md dark:border-white/10 dark:bg-[#0D1B2A]"
                 >
                   <span
-                    className="pointer-events-none absolute -right-2 top-1/2 z-0 -translate-y-1/2 select-none font-black tabular-nums leading-none text-black/[0.04] dark:text-white/[0.04]"
-                    style={{ fontSize: "clamp(4rem, 16vw, 10rem)" }}
+                    className="pointer-events-none absolute -right-2 top-1/2 z-0 hidden -translate-y-1/2 select-none font-black tabular-nums leading-none text-black/[0.04] dark:text-white/[0.04] sm:block"
+                    style={{ fontSize: "clamp(3.5rem, 12vw, 10rem)" }}
                     aria-hidden
                   >
                     {weekNum}
@@ -336,7 +337,7 @@ export default function CoursesPage() {
                     id={triggerId}
                     type="button"
                     onClick={() => toggleWeek(w.week)}
-                    className="relative z-10 flex w-full items-start gap-4 px-6 py-5 text-left transition hover:bg-black/[0.02] dark:hover:bg-white/[0.02]"
+                    className="relative z-10 flex w-full items-start gap-3 px-4 py-4 text-left transition hover:bg-black/[0.02] dark:hover:bg-white/[0.02] sm:gap-4 sm:px-6 sm:py-5"
                     aria-expanded={isOpen}
                     aria-controls={isOpen ? panelId : undefined}
                   >
@@ -472,7 +473,7 @@ export default function CoursesPage() {
           </div>
 
           {/* Capstone Highlight */}
-          <div className="mt-8 rounded-3xl border border-[#1E3FE0]/30 bg-gradient-to-r from-[#12266E] to-[#1E3FE0] p-8 text-white shadow-2xl">
+          <div className="mt-8 rounded-3xl border border-[#1E3FE0]/30 bg-gradient-to-r from-[#12266E] to-[#1E3FE0] p-5 text-white shadow-2xl sm:p-8">
             <span className="font-annotation text-xs font-bold uppercase tracking-widest text-[#E8622E]">
               ★ WEEK 12 CAPSTONE PROJECT
             </span>
@@ -487,7 +488,7 @@ export default function CoursesPage() {
                 <span className="text-xs font-bold uppercase text-[#E8622E]">CAPSTONE DELIVERABLE:</span>
                 <p className="mt-1 text-xs italic text-white">&ldquo;{capstoneWeek?.assignment}&rdquo;</p>
               </div>
-              <EnrollNowLink className="inline-flex min-h-12 shrink-0 items-center justify-center rounded-full bg-[#E8622E] px-8 text-xs font-bold uppercase tracking-wider text-white shadow-lg transition hover:bg-[#d55321]">
+              <EnrollNowLink className="inline-flex h-12 w-full items-center justify-center whitespace-nowrap rounded-full bg-[#E8622E] px-8 text-xs font-bold uppercase tracking-wider text-white shadow-lg transition hover:bg-[#d55321] sm:w-auto">
                 Enroll Now
               </EnrollNowLink>
             </div>
@@ -508,7 +509,7 @@ export default function CoursesPage() {
       >
         <EnrollNowLink
           aria-label="Enroll in AI Tools Mastery program"
-          className="pointer-events-auto inline-flex min-h-12 items-center justify-center rounded-full bg-[#E8622E] px-8 text-sm font-bold uppercase tracking-wider text-white shadow-2xl transition hover:bg-[#d55321]"
+          className="pointer-events-auto inline-flex h-12 w-full max-w-sm items-center justify-center whitespace-nowrap rounded-full bg-[#E8622E] px-8 text-sm font-bold uppercase tracking-wider text-white shadow-2xl transition hover:bg-[#d55321] sm:w-auto sm:max-w-none"
         >
           Enroll Now
         </EnrollNowLink>

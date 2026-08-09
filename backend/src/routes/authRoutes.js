@@ -22,12 +22,18 @@ import {
   updateAuthorizedAdmin,
   removeAuthorizedAdmin,
   getAdminProfile,
+  recordAdminLogout,
   requireAdminSession,
   requireSuperAdmin,
   requireMainSuperAdmin,
   getAdminPortalSettings,
   updateAdminPortalSettings,
 } from "../controllers/authorizedAdminController.js";
+import {
+  listAdminOrgRoles,
+  createAdminOrgRole,
+  updateAdminOrgRole,
+} from "../controllers/adminOrgRoleController.js";
 import { verifyToken, checkRole } from "../middleware/auth.js";
 import {
   authRateLimit,
@@ -55,6 +61,7 @@ router.post("/forgot-password/reset", passwordResetRateLimit, resetPasswordHandl
 
 // Admin session routes (super admin manages authorized emails)
 router.get("/admin/me", requireAdminSession, getAdminProfile);
+router.post("/admin/logout", requireAdminSession, recordAdminLogout);
 router.get(
   "/admin/portal-settings",
   requireAdminSession,
@@ -91,6 +98,14 @@ router.delete(
   requireAdminSession,
   requireSuperAdmin,
   removeAuthorizedAdmin
+);
+router.get("/admin/org-roles", requireAdminSession, requireSuperAdmin, listAdminOrgRoles);
+router.post("/admin/org-roles", requireAdminSession, requireSuperAdmin, createAdminOrgRole);
+router.patch(
+  "/admin/org-roles/:key",
+  requireAdminSession,
+  requireSuperAdmin,
+  updateAdminOrgRole
 );
 
 // Protected routes (require authentication)

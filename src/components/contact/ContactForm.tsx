@@ -85,7 +85,7 @@ export function ContactForm() {
     <>
       <div
         id="contact-form"
-        className="scroll-mt-24 rounded-3xl border border-black/10 bg-[#F6F1E4] p-8 shadow-2xl dark:border-white/10 dark:bg-[#0D1B2A] lg:p-10"
+        className="scroll-mt-24 rounded-3xl border border-black/10 bg-[#F6F1E4] p-5 shadow-2xl dark:border-white/10 dark:bg-[#0D1B2A] sm:p-8 lg:p-10"
         aria-labelledby="contact-form-heading"
       >
         <span className="font-annotation text-xs font-bold uppercase tracking-widest text-[#E8622E]">
