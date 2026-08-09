@@ -1,5 +1,6 @@
 import type { AdminModuleDetail } from "@/types/moduleEditor";
 import type { SecurityReport } from "@/types/security";
+import type { SystemHealthReport } from "@/types/systemHealth";
 import { API_URL, wrapBackendFetchError } from "@/lib/api";
 import { clearPortalSessionId } from "@/lib/lmsSession";
 import {
@@ -769,6 +770,116 @@ export async function getAdminSecurityReport(): Promise<SecurityReport> {
     throw wrapBackendFetchError(err, "Failed to load security report");
   }
 }
+
+export async function getAdminSystemHealth(): Promise<SystemHealthReport> {
+  try {
+    const response = await fetch(`${API_URL}/admin/system-health`, {
+      headers: getAdminAuthHeaders(),
+      cache: "no-store",
+    });
+
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.message || "Failed to load system health");
+    }
+
+    return data.data;
+  } catch (err) {
+    throw wrapBackendFetchError(err, "Failed to load system health");
+  }
+}
+
+export async function updateAdminSystemMaintenance(payload: {
+  enabled: boolean;
+  message?: string;
+}): Promise<SystemHealthReport["maintenance"]> {
+  try {
+    const response = await fetch(`${API_URL}/admin/system-health/maintenance`, {
+      method: "PATCH",
+      headers: {
+        ...getAdminAuthHeaders(),
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+      cache: "no-store",
+    });
+
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.message || "Failed to update maintenance mode");
+    }
+
+    return data.data;
+  } catch (err) {
+    throw wrapBackendFetchError(err, "Failed to update maintenance mode");
+  }
+}
+
+export async function recycleAdminDatabasePool(): Promise<{
+  latencyMs: number;
+  detail: string;
+  recycledAt: string;
+}> {
+  try {
+    const response = await fetch(`${API_URL}/admin/system-health/recycle-db`, {
+      method: "POST",
+      headers: getAdminAuthHeaders(),
+      cache: "no-store",
+    });
+
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.message || "Failed to recycle database pool");
+    }
+
+    return data.data;
+  } catch (err) {
+    throw wrapBackendFetchError(err, "Failed to recycle database pool");
+  }
+}
+
+export async function getPublicPlatformStatus(): Promise<{
+  maintenanceMode: boolean;
+  maintenanceMessage: string | null;
+  checkedAt: string;
+}> {
+  try {
+    const response = await fetch(`${API_URL}/platform/status`, {
+      cache: "no-store",
+    });
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.message || "Failed to load platform status");
+    }
+    return data.data;
+  } catch (err) {
+    throw wrapBackendFetchError(err, "Failed to load platform status");
+  }
+}
+
+/** Clears admin UI caches in this browser without signing the admin out. */
+export function clearAdminBrowserCaches(): { cleared: string[] } {
+  const cleared: string[] = [];
+  if (typeof window === "undefined") return { cleared };
+
+  const keys = [ADMIN_PROFILE_CACHE_KEY, "adminSearchRecent"];
+  for (const key of keys) {
+    if (localStorage.getItem(key) != null) {
+      localStorage.removeItem(key);
+      cleared.push(key);
+    }
+  }
+
+  try {
+    sessionStorage.clear();
+    cleared.push("sessionStorage");
+  } catch {
+    /* ignore */
+  }
+
+  return { cleared };
+}
+
 
 export interface AdminAssignmentRecord {
   id: string;

@@ -2,71 +2,18 @@ import { PrismaClient } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import pg from "pg";
 import dotenv from "dotenv";
-import fs from "fs";
-import path from "path";
-import { fileURLToPath } from "url";
+import { createPoolConfig } from "../src/config/databaseSsl.js";
 
 dotenv.config();
 
 const { Pool } = pg;
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-// Expand user home directory path
-function expandUserPath(filePath) {
-  if (filePath.startsWith("~")) {
-    return path.join(process.env.HOME || process.env.USERPROFILE, filePath.slice(1));
-  }
-  return filePath;
-}
-
-// Initialize Prisma Client with proper adapter
 const connectionString = process.env.DATABASE_URL;
-
 if (!connectionString) {
   throw new Error("DATABASE_URL environment variable is not set");
 }
 
-// Configure SSL for CockroachDB/PostgreSQL
-let sslConfig = false;
-
-if (connectionString.includes("cockroach") || process.env.NODE_ENV === "production") {
-  try {
-    const certPath = expandUserPath("~/.postgresql/root.crt");
-    if (fs.existsSync(certPath)) {
-      sslConfig = {
-        rejectUnauthorized: true,
-        ca: fs.readFileSync(certPath).toString(),
-      };
-      console.log("✅ Using SSL certificate for CockroachDB");
-    } else {
-      sslConfig = {
-        rejectUnauthorized: false,
-      };
-      console.log("⚠️  SSL certificate not found, using insecure connection");
-    }
-  } catch (err) {
-    console.warn("⚠️  Could not configure SSL:", err.message);
-    sslConfig = {
-      rejectUnauthorized: false,
-    };
-  }
-}
-
-const poolConfig = { 
-  connectionString,
-  max: 20,
-  idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 15000,
-  statement_timeout: 30000,
-  keepalives: true,
-  keepalives_idle: 30,
-};
-
-if (sslConfig) {
-  poolConfig.ssl = sslConfig;
-}
-
-const pool = new Pool(poolConfig);
+const pool = new Pool(createPoolConfig(connectionString));
 const adapter = new PrismaPg(pool);
 const prisma = new PrismaClient({ adapter });
 

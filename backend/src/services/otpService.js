@@ -15,6 +15,7 @@ import {
   normalizeIanaTimeZone,
   sendAdminLoginAlertEmail,
 } from "../utils/adminLoginAlert.js";
+import { insertAdminLoginLog } from "../utils/ensureAdminLoginLogSchema.js";
 
 const OTP_EXPIRY_MINUTES = 10;
 const MAX_REQUESTS_PER_WINDOW = 5;
@@ -379,6 +380,16 @@ export async function verifyAdminOtp(rawEmail, rawOtp, loginContext = {}) {
     .catch((error) => {
       console.warn("[otpService] could not persist admin login metadata:", error.message);
     });
+
+  insertAdminLoginLog({
+    adminId: authorizedAdmin.id,
+    email,
+    name: displayName,
+    ipAddress: loginContext.ipAddress || null,
+    userAgent: loginContext.userAgent || null,
+  }).catch((error) => {
+    console.warn("[otpService] could not persist admin login audit log:", error.message);
+  });
 
   sendAdminLoginAlertEmail({
     email,

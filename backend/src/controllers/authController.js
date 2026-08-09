@@ -166,6 +166,7 @@ export const registerUser = async (req, res) => {
             data: {
               userId: dbUser.id,
               firebaseToken: idToken,
+              deviceInfo: "LMS_PORTAL",
               expiresAt: new Date(Date.now() + 3600 * 1000),
             },
           });
@@ -221,6 +222,7 @@ export const registerUser = async (req, res) => {
           data: {
             userId: updatedUser.id,
             firebaseToken: idToken,
+            deviceInfo: "LMS_PORTAL",
             expiresAt: new Date(Date.now() + 3600 * 1000), // 1 hour
           },
         });
@@ -278,6 +280,7 @@ export const registerUser = async (req, res) => {
       data: {
         userId: dbUser.id,
         firebaseToken: idToken,
+        deviceInfo: "LMS_PORTAL",
         expiresAt: new Date(Date.now() + 3600 * 1000), // 1 hour
       },
     });
@@ -357,6 +360,7 @@ export const loginUser = async (req, res) => {
         data: {
           userId: dbUser.id,
           firebaseToken: customToken,
+          deviceInfo: "LMS_PORTAL",
           expiresAt: new Date(Date.now() + 3600 * 1000), // 1 hour
         },
       });
@@ -524,6 +528,7 @@ export const handleGoogleAuth = async (req, res) => {
       data: {
         userId: dbUser.id,
         firebaseToken: idToken,
+        deviceInfo: "LMS_PORTAL",
         expiresAt: new Date(Date.now() + 3600 * 1000), // 1 hour
       },
     });

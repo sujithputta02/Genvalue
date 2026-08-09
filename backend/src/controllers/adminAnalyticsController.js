@@ -1,13 +1,33 @@
 import { prisma } from "../config/database.js";
 import { fetchRecentUserRemovalLogs } from "../utils/ensureUserRemovalLogSchema.js";
+import { fetchRecentAdminLoginLogs } from "../utils/ensureAdminLoginLogSchema.js";
 import { isListableUserRole } from "../utils/ensureUserRoleEnum.js";
 import { LMS_STUDENT_ROLE } from "../constants/lmsRoles.js";
+
+const LMS_PORTAL_LABEL = "LMS Portal";
+const ADMIN_PORTAL_LABEL = "Admin Portal";
+
+function portalLabelFromSession(session) {
+  const marker = String(session.deviceInfo || "").toUpperCase();
+  if (marker === "ADMIN_PORTAL" || marker.includes("ADMIN")) {
+    return ADMIN_PORTAL_LABEL;
+  }
+  // Session rows are created by LMS Firebase auth; treat unset markers as LMS.
+  return LMS_PORTAL_LABEL;
+}
 
 async function buildAuditLogs(fetchLimit = 200) {
   const take = Math.min(Math.max(fetchLimit, 50), 500);
 
-  const [quizResponses, gradedSubmissions, submittedAssignments, recentUsers, sessions, removalLogs] =
-    await Promise.all([
+  const [
+    quizResponses,
+    gradedSubmissions,
+    submittedAssignments,
+    recentUsers,
+    sessions,
+    removalLogs,
+    adminLoginLogs,
+  ] = await Promise.all([
       prisma.quizResponse.findMany({
         take,
         orderBy: { attemptedAt: "desc" },
@@ -45,6 +65,7 @@ async function buildAuditLogs(fetchLimit = 200) {
         include: { user: { select: { name: true } } },
       }),
       fetchRecentUserRemovalLogs(take),
+      fetchRecentAdminLoginLogs(take),
     ]);
 
   const events = [];
@@ -98,14 +119,27 @@ async function buildAuditLogs(fetchLimit = 200) {
   }
 
   for (const session of sessions) {
+    const portal = portalLabelFromSession(session);
     events.push({
       id: `session-${session.id}`,
       userId: session.userId,
       userName: session.user?.name ?? "Unknown User",
       action: "USER_LOGIN",
-      details: "Signed in to the platform",
+      details: `Signed in to the ${portal}`,
       ipAddress: session.ipAddress ?? "—",
       timestamp: session.createdAt.toISOString(),
+    });
+  }
+
+  for (const log of adminLoginLogs) {
+    events.push({
+      id: `admin-login-${log.id}`,
+      userId: log.adminId ?? log.email,
+      userName: log.name || log.email,
+      action: "USER_LOGIN",
+      details: `Signed in to the ${ADMIN_PORTAL_LABEL}`,
+      ipAddress: log.ipAddress ?? "—",
+      timestamp: new Date(log.createdAt).toISOString(),
     });
   }
 

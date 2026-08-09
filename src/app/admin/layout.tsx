@@ -20,6 +20,7 @@ import {
   FaUsers,
   FaXmark,
   FaLock,
+  FaHeartPulse,
 } from "react-icons/fa6";
 import Avatar from "@/components/ui/Avatar";
 import { applyLiquidGlass } from "@/lib/liquid-glass";
@@ -51,6 +52,7 @@ const NAV_ITEMS = [
   { label: "The Dispatch", href: "/admin/dispatch", Icon: FaNewspaper, section: "DISPATCH" as const },
   { label: "Bug Reports", href: "/admin/bug-reports", Icon: FaBug, section: "BUG_REPORTS" as const },
   { label: "System Audit Logs", href: "/admin/audit-logs", Icon: FaClockRotateLeft, section: "AUDIT_LOGS" as const },
+  { label: "System Health", href: "/admin/system-health", Icon: FaHeartPulse, section: "SECURITY" as const },
   { label: "Security", href: "/admin/security", Icon: FaLock, section: "SECURITY" as const },
   { label: "Settings", href: SETTINGS_PATH, Icon: FaGear, section: null },
 ];
@@ -62,6 +64,7 @@ const SEARCH_DESTINATIONS = [
   { keywords: ["dispatch", "blog", "post", "article"], href: "/admin/dispatch", label: "The Dispatch" },
   { keywords: ["bug", "report", "issue", "student feedback"], href: "/admin/bug-reports", label: "Bug Reports" },
   { keywords: ["audit", "log", "system"], href: "/admin/audit-logs", label: "System Audit Logs" },
+  { keywords: ["health", "uptime", "status", "ops", "monitor", "latency"], href: "/admin/system-health", label: "System Health" },
   { keywords: ["security", "portal", "auth", "token", "evaluation"], href: "/admin/security", label: "Security" },
   { keywords: ["authorized", "admin", "email"], href: SUPER_ADMIN_ONLY_PATH, label: "Authorized Admins" },
   { keywords: ["settings", "profile", "account"], href: SETTINGS_PATH, label: "Settings" },

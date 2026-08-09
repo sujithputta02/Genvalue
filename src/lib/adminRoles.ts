@@ -64,6 +64,7 @@ export const ADMIN_NAV_SECTION_MAP: Record<string, PortalSectionKey> = {
   "/admin/announcements": "ANNOUNCEMENTS",
   "/admin/dispatch": "DISPATCH",
   "/admin/audit-logs": "AUDIT_LOGS",
+  "/admin/system-health": "SECURITY",
   "/admin/security": "SECURITY",
   "/admin/bug-reports": "BUG_REPORTS",
 };
@@ -138,6 +139,7 @@ const NAV_ROUTE_ORDER: { href: string; section: PortalSectionKey }[] = [
   { href: "/admin/dispatch", section: "DISPATCH" },
   { href: "/admin/bug-reports", section: "BUG_REPORTS" },
   { href: "/admin/audit-logs", section: "AUDIT_LOGS" },
+  { href: "/admin/system-health", section: "SECURITY" },
   { href: "/admin/security", section: "SECURITY" },
 ];
 

@@ -118,8 +118,7 @@ export default function AdminAuditLogsPage() {
           System Audit Logs
         </h1>
         <p className="text-xs font-medium text-[#6B6558] dark:text-slate-400">
-          Filter by event type, time range, or user - paginated so you never need to scroll through
-          hundreds of rows.
+          Sign-ins show LMS Portal or Admin Portal. Filter by event type, time range, or user.
         </p>
       </div>
 

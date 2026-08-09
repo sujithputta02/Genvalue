@@ -170,6 +170,21 @@ model UserRemovalLog {
   @@map("user_removal_logs")
 }
 
+// Audit trail for successful admin portal OTP sign-ins
+model AdminLoginLog {
+  id          String   @id @default(uuid())
+  adminId     String?
+  email       String
+  name        String
+  ipAddress   String?
+  userAgent   String?
+  createdAt   DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([email])
+  @@map("admin_login_logs")
+}
+
 // Authorized admin emails - managed by super admin
 model AuthorizedAdmin {
   id           String   @id @default(uuid())
@@ -197,6 +212,8 @@ model AuthorizedAdmin {
 model AdminPortalSettings {
   id                  String   @id @default("default")
   maxAuthorizedAdmins Int      @default(5)
+  maintenanceMode     Boolean  @default(false)
+  maintenanceMessage  String?
   updatedAt           DateTime @updatedAt
   updatedByEmail      String?
 

@@ -12,6 +12,7 @@ import blogRoutes from "./blogRoutes.js";
 import bugReportRoutes from "./bugReportRoutes.js";
 import adminRoutes from "./adminRoutes.js";
 import { apiRateLimit } from "../middleware/rateLimiter.js";
+import { getPublicPlatformStatus } from "../controllers/systemHealthController.js";
 
 /**
  * Mount all versioned API routes onto a router.
@@ -20,6 +21,8 @@ import { apiRateLimit } from "../middleware/rateLimiter.js";
 export function createApiV1Router() {
   const router = express.Router();
   router.use(apiRateLimit);
+
+  router.get("/platform/status", getPublicPlatformStatus);
 
   router.use("/auth", authRoutes);
   router.use("/dashboard", dashboardRoutes);

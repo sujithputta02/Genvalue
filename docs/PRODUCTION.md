@@ -57,6 +57,8 @@ GET https://YOUR-API.onrender.com/health
 | `NODE_ENV` | `production` |
 | `PORT` | `10000` (or leave to Render) |
 | `DATABASE_URL` | Cockroach/Postgres connection string |
+| `DATABASE_CA_CERT` | Cockroach Cloud CA PEM (recommended on Render). Download CA from Cockroach Cloud → connect, paste into Render env. |
+| `DATABASE_SSL_INSECURE` | **Never** in production. Local-only escape hatch. |
 | `FRONTEND_URL` | `https://YOUR-APP.vercel.app` (must be **https**) |
 | `CORS_ORIGINS` | Optional extras, comma-separated |
 | `ADMIN_JWT_SECRET` | Long random string |
@@ -138,6 +140,8 @@ Without this, Google / email link flows fail in production.
 | Admin OTP fails | Set Brevo SMTP on **Render** |
 | Empty DB / Prisma errors | Run `prisma migrate deploy` against production `DATABASE_URL` |
 | Build fails missing bun.lock | Ensure `backend/bun.lock` is committed |
+| SSL warning / admin portal timeouts | Strip local `sslrootcert=~/.postgresql/...` from Render `DATABASE_URL`; set `DATABASE_CA_CERT` from Cockroach Cloud CA PEM |
+| `net::ERR_TIMED_OUT` on admin RSC | Usually API/DB hang on Render (cold start or bad SSL path). Fix SSL first, then check `/health` |
 
 ---
 

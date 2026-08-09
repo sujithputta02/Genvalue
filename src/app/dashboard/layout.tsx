@@ -63,6 +63,10 @@ export default function StudentDashboardLayout({
   const [searchQuery, setSearchQuery] = useState("");
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
   const [notificationCount, setNotificationCount] = useState(0);
+  const [maintenance, setMaintenance] = useState<{
+    active: boolean;
+    message: string | null;
+  }>({ active: false, message: null });
   const navbarRef = useRef<HTMLDivElement>(null);
   const mobileSearchInputRef = useRef<HTMLInputElement>(null);
 
@@ -109,6 +113,25 @@ export default function StudentDashboardLayout({
     fetchUnreadCount();
     // Poll for updates every 30 seconds
     const interval = setInterval(fetchUnreadCount, 30000);
+    return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    const checkMaintenance = async () => {
+      try {
+        const response = await fetch(`${API_URL}/platform/status`, { cache: "no-store" });
+        if (!response.ok) return;
+        const data = await response.json();
+        setMaintenance({
+          active: Boolean(data?.data?.maintenanceMode),
+          message: data?.data?.maintenanceMessage ?? null,
+        });
+      } catch {
+        /* keep LMS available if status probe fails */
+      }
+    };
+    void checkMaintenance();
+    const interval = setInterval(checkMaintenance, 60000);
     return () => clearInterval(interval);
   }, []);
 
@@ -214,6 +237,37 @@ export default function StudentDashboardLayout({
 
   if (loading) {
     return <PortalLayoutSkeleton portal="lms" />;
+  }
+
+  if (maintenance.active) {
+    return (
+      <div className="relative flex min-h-dvh items-center justify-center overflow-hidden bg-[#EDE6D3] px-4 py-12 text-[#2A2A28] dark:bg-[#070B19] dark:text-white">
+        <div
+          className="pointer-events-none absolute inset-0 opacity-[0.05] [background-image:linear-gradient(#000_1px,transparent_1px),linear-gradient(90deg,#000_1px,transparent_1px)] [background-size:24px_24px] dark:opacity-[0.07] dark:[background-image:linear-gradient(#fff_1px,transparent_1px),linear-gradient(90deg,#fff_1px,transparent_1px)]"
+          aria-hidden
+        />
+        <div className="relative z-10 w-full max-w-lg rounded-3xl border border-black/10 bg-[#F6F1E4] p-8 text-center shadow-2xl dark:border-white/10 dark:bg-[#0D1B2A]">
+          <p className="font-annotation text-xs font-bold uppercase tracking-widest text-[#E8622E]">
+            ★ Maintenance
+          </p>
+          <h1 className="font-display-custom mt-3 text-2xl font-extrabold tracking-tight sm:text-3xl">
+            LMS temporarily unavailable
+          </h1>
+          <p className="mt-3 text-sm font-medium leading-relaxed text-[#6B6558] dark:text-slate-300">
+            {maintenance.message ||
+              "GenValue LMS is temporarily under maintenance. Please check back shortly."}
+          </p>
+          <button
+            type="button"
+            onClick={handleSignOut}
+            className="mt-6 inline-flex min-h-11 items-center justify-center rounded-full bg-[#1E3FE0] px-6 text-xs font-bold uppercase tracking-wider text-white dark:bg-[#60A5FA] dark:text-[#070B19]"
+            aria-label="Sign out of LMS"
+          >
+            Sign Out
+          </button>
+        </div>
+      </div>
+    );
   }
 
   return (
